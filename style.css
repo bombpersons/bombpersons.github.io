@@ -1,0 +1,26 @@
+.columns {
+  columns-count: 2;
+  column-width: 600px;
+  column-gap: 4em;
+  column-rule: 1px dotted #333;
+  text-align: center;
+}
+
+body {
+  background-color: #17211E;
+  color: #F3F3F3;
+  font-family: monospace
+}
+
+a {
+  color: #F5853F;
+}
+
+h1 {
+  color: #F5853F;
+  text-align: center;
+}
+
+h2 {
+  column-span: all;
+}

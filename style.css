@@ -9,7 +9,8 @@
 body {
   background-color: #17211E;
   color: #F3F3F3;
-  font-family: monospace
+  font-family: monospace;
+  text-align: center;
 }
 
 a {

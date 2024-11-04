@@ -6,9 +6,13 @@
     <h1>Portfolio</h1>
 
     <h2>Personal Projects</h2>
-    <p>Projects I'm currently working on. Since I started working I've not had as much time to dedicate to my own projects, but I try my best to work on these whenever I get the chance.</p>
+    <p>Projects I've worked on / working on. I've been using Rust a lot more lately rather than C or C++.</p>
     <br/>
 
+    <h3>WordySRS (Rust, HTML, CSS, Javascript) (<a href="https://github.com/bombpersons/wordysrs">github page</a>)</h3>
+    <img src="wordysrs_screenshot.png">
+    <p>The idea was to create something that could ingest all of the foreign language media that you've been reading with little effort on your part and present you with SRS cards for learning the vocab present in your reading material. This came about as I realized how much time it was taking to write up Anki cards whenever I was reading something. It was taking the joy out of the actual reading. This application takes in the entire text of whatever you have been reading, splits it into sentences and keeps track of the total word frequency. It then presents you with sentences for each vocab word in the material in it's database, highest frequency first, making sure the sentences it shows has the fewest 'new' words so that you don't get bogged down in irrelevant low frequency words.</p>
+    
     <h3>Noroi [WIP] (C, C++, Haskell) (<a href="https://github.com/bombpersons/noroi">github page</a>)</h3>
     <img src="noroi_screenshot.png"></img>
     <p>A modern library for creating ASCII based text games similar to dwarffortress, rogue, etc. It uses a server/client model to separate rendering from any game logic. The server represents the screen (or the terminal) and the client represents the game / program. The library uses libzmq to handle communication between the server and client, and is capable of interthread (client and server in the same program), interprocess (client and server being separate programs) and network (client and server on different computers) communication.</p>

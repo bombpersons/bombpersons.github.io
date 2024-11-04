@@ -26,6 +26,6 @@ h2 {
   column-span: all;
 }
 
-content {
+.content {
   width: 700px;
 }

@@ -3,78 +3,79 @@
     <link rel="stylesheet" type="text/css" href="style.css"/>
   </head>
   <body>
-    <h1>Portfolio</h1>
-
-    <h2>Personal Projects</h2>
-    <p>Projects I've worked on / working on. I've been using Rust a lot more lately rather than C or C++.</p>
-    <br/>
-
-    <h3>Egg Rpg [WIP] (Rust) (<a href="https://github.com/bombpersons/egg_rpg">github page</a>)</h3>
-    <img src="egg_rpg.gif">
-    <p>A simple 2d tile based RPG game with gameboy inspired visuals. Currently you can pretty much only move around the map and enter buildings.</p>
-    <br/>
-    
-    <h3>WordySRS (Rust, HTML, CSS, Javascript) (<a href="https://github.com/bombpersons/wordysrs">github page</a>)</h3>
-    <img src="wordysrs_screenshot.png" width="50%">
-    <p>The idea was to create something that could ingest all of the foreign language media that you've been reading with little effort on your part and present you with SRS cards for learning the vocab present in your reading material. This came about as I realized how much time it was taking to write up Anki cards whenever I was reading something. It was taking the joy out of the actual reading. This application takes in the entire text of whatever you have been reading, splits it into sentences and keeps track of the total word frequency. It then presents you with sentences for each vocab word in the material in it's database, highest frequency first, making sure the sentences it shows has the fewest 'new' words so that you don't get bogged down in irrelevant low frequency words.</p>
-    <br/>
-    
-    <h3>Noroi [WIP] (C, C++, Haskell) (<a href="https://github.com/bombpersons/noroi">github page</a>)</h3>
-    <img src="noroi_screenshot.png"></img>
-    <p>A modern library for creating ASCII based text games similar to dwarffortress, rogue, etc. It uses a server/client model to separate rendering from any game logic. The server represents the screen (or the terminal) and the client represents the game / program. The library uses libzmq to handle communication between the server and client, and is capable of interthread (client and server in the same program), interprocess (client and server being separate programs) and network (client and server on different computers) communication.</p>
-    <p>Currently there is only one server, a server written using glfw and opengl 3.0, although other servers could be easily written by simply accepting the same communication protocol.</p>
-    <p>A WIP haskell binding exists <a href="https://github.com/bombpersons/noroi-haskell">here</a>.</p>
-    <br/>
-
-    <h3>libOrange [WIP] (C++) (<a href="https://github.com/bombpersons/libOrange">github page</a>)</h3>
-    <p>Yet another cross platform opengl framework. The goal here was to create something similar to SFML completely from scratch, that could be used for gamejams in the future.</p>
-    <p>Currently supports opengl 3.0 context creation, keyboard and mouse input for windows and linux. Helper classes available for framebuffers, meshes, shaders, spritebatches, textures and texture atlases.</p>
-    <br/>
-
-    <h2>University Projects</h2>
-    <p>Projects whilst I worked on my Computer Games Programming degree at <a href="https://www.derby.ac.uk/">The University of Derby</a> (2010-2014).</p>
-    <br/>
-
-    <h3>Knife and fork (C#, XNA) (<a href="https://github.com/bombpersons/KnifeAndFork">github page</a>)</h3>
-    <iframe width="640" height="360" src="https://www.youtube.com/embed/tjmwAP_SQGw" frameborder="0" allowfullscreen></iframe>
-    <p>A game made for the final module for the first year of university. Our design goal was asymmetrical gameplay.</p>
-    <p>One player plays as a knife and the other as a fork. Their goal is to work together to collect required pieces of food to the dinner plate, although it won't be easy as this food fights back.</p>
-    <p>Features a component based enemy design that allows them to be cut up into pieces and their functionality breaks up appropriately. Cut of their wings and the part without the wings will fall, cut off their fuse and and the part without won't explode, etc.</p>
-    <br/>
-
-    <h3>Dokuro3D [Software Renderer] (C++) (<a href="https://github.com/bombpersons/Dokuro3D">github page</a>)</h3>
-    <iframe width="640" height="360" src="https://www.youtube.com/embed/nUhEk0YRtM0" frameborder="0" allowfullscreen></iframe>
-    <p>A software renderer written for a university module in our second year, using the win32 API and GDI.</p>
-    <br/>
-
-    <h3>2D shooter with STRIPS planning AI (C++, SFML) (<a href="https://github.com/bombpersons/STRIPS_AI_Shooter">github page</a>)</h3>
-    <iframe width="640" height="360" src="https://www.youtube.com/embed/KUACU25uvIA" frameborder="0" allowfullscreen></iframe>
-    <p>As part of an AI module in the final year, I created this simple 2D shooter as a test for implementing AI planning (based on GOAP originally used in F.E.A.R). The goal was to have a top down arena style shooter with AI that would duck for cover, acquire amnunition and health, and seek out and eliminate competition.</p>
-    <br/>
-
-    <h2>Pillowdrift (2012-2013) (<a href="http://pillowdrift.com">site</a>)</h2>
-    <p>As part of a year of work experience during my university degree, myself and 3 other friends got together and created our own games company.</p>
-    <br/>
-
-    <h3>Mega Driller Mole (Java, libGDX) (<a href="https://play.google.com/store/apps/details?id=com.pillowdrift.drillergame">android</a>) (<a href="http://pillowdrift.com/downloads/MegaDrillerMolePC.jar">windows/mac/linux</a>)</h3>
-    <iframe width="640" height="360" src="https://www.youtube.com/embed/bYb1vm5-DYE" frameborder="0" allowfullscreen></iframe>
-    <p>Our first game release, dig for gems with your drill whilst avoiding demons, mines, worms and worse to surface and deposit your treasure into the train following you above. Gain bonus points for getting more height.</p>
-    <br/>
-
-    <h3>Stellar Swing (Stellar Void) (C#, Unity3D) (<a href="https://play.google.com/store/apps/details?id=com.pillowdrift.stellarswing&hl=en_GB">android</a>) (<a href="http://pillowdrift.com/downloads/stellarswing-windows.zip">windows</a>)</h3>
-    <iframe width="640" height="360" src="https://www.youtube.com/embed/8TPKQu8jN64" frameborder="0" allowfullscreen></iframe>
-    <p>Our second game release, play as a mining drone with a laser grapple and swing your way to the end of the level.</p>
-    <br/>
-
-    <h3>Rocket Dodger (C#, Unity3D) (<a href="https://github.com/bombpersons/RocketDodger">github page</a>) (<a href="https://bombpersons.github.io/RocketDodger/">play online</a>)</h3>
-    <p>A small mobile game we didn't have enough time to finish during our years work experience. A fun little game in which the goal is to avoid being hit by heat seeking rockets. Gain boost by doing risky / cool things such as getting close misses, rockets closely tailing you or even destroying rockets by allowing them to crash into each other.</p>
-    <p>
-    Click and drag with your mouse to move your player around, hold right click to use your boost.
-    </p>
-    </br>
-
-    <h3>Loyd's Tale [Ludum Dare] (C#, XNA) (<a href="https://www.dropbox.com/s/yedqvsblpspw3ta/LoydsTale.zip?dl=0">download</a>) (<a href="http://ludumdare.com/compo/ludum-dare-22/?action=preview&uid=8218">ludum dare</a>)</h3>
-    <p>A short 2D platformer game made in 48 hours.</p>
-
+    <div class="content">
+      <h1>Portfolio</h1>
+  
+      <h2>Personal Projects</h2>
+      <p>Projects I've worked on / working on. I've been using Rust a lot more lately rather than C or C++.</p>
+      <br/>
+  
+      <h3>Egg Rpg [WIP] (Rust) (<a href="https://github.com/bombpersons/egg_rpg">github page</a>)</h3>
+      <img src="egg_rpg.gif">
+      <p>A simple 2d tile based RPG game with gameboy inspired visuals. Currently you can pretty much only move around the map and enter buildings.</p>
+      <br/>
+      
+      <h3>WordySRS (Rust, HTML, CSS, Javascript) (<a href="https://github.com/bombpersons/wordysrs">github page</a>)</h3>
+      <img src="wordysrs_screenshot.png" width="50%">
+      <p>The idea was to create something that could ingest all of the foreign language media that you've been reading with little effort on your part and present you with SRS cards for learning the vocab present in your reading material. This came about as I realized how much time it was taking to write up Anki cards whenever I was reading something. It was taking the joy out of the actual reading. This application takes in the entire text of whatever you have been reading, splits it into sentences and keeps track of the total word frequency. It then presents you with sentences for each vocab word in the material in it's database, highest frequency first, making sure the sentences it shows has the fewest 'new' words so that you don't get bogged down in irrelevant low frequency words.</p>
+      <br/>
+      
+      <h3>Noroi [WIP] (C, C++, Haskell) (<a href="https://github.com/bombpersons/noroi">github page</a>)</h3>
+      <img src="noroi_screenshot.png"></img>
+      <p>A modern library for creating ASCII based text games similar to dwarffortress, rogue, etc. It uses a server/client model to separate rendering from any game logic. The server represents the screen (or the terminal) and the client represents the game / program. The library uses libzmq to handle communication between the server and client, and is capable of interthread (client and server in the same program), interprocess (client and server being separate programs) and network (client and server on different computers) communication.</p>
+      <p>Currently there is only one server, a server written using glfw and opengl 3.0, although other servers could be easily written by simply accepting the same communication protocol.</p>
+      <p>A WIP haskell binding exists <a href="https://github.com/bombpersons/noroi-haskell">here</a>.</p>
+      <br/>
+  
+      <h3>libOrange [WIP] (C++) (<a href="https://github.com/bombpersons/libOrange">github page</a>)</h3>
+      <p>Yet another cross platform opengl framework. The goal here was to create something similar to SFML completely from scratch, that could be used for gamejams in the future.</p>
+      <p>Currently supports opengl 3.0 context creation, keyboard and mouse input for windows and linux. Helper classes available for framebuffers, meshes, shaders, spritebatches, textures and texture atlases.</p>
+      <br/>
+  
+      <h2>University Projects</h2>
+      <p>Projects whilst I worked on my Computer Games Programming degree at <a href="https://www.derby.ac.uk/">The University of Derby</a> (2010-2014).</p>
+      <br/>
+  
+      <h3>Knife and fork (C#, XNA) (<a href="https://github.com/bombpersons/KnifeAndFork">github page</a>)</h3>
+      <iframe width="640" height="360" src="https://www.youtube.com/embed/tjmwAP_SQGw" frameborder="0" allowfullscreen></iframe>
+      <p>A game made for the final module for the first year of university. Our design goal was asymmetrical gameplay.</p>
+      <p>One player plays as a knife and the other as a fork. Their goal is to work together to collect required pieces of food to the dinner plate, although it won't be easy as this food fights back.</p>
+      <p>Features a component based enemy design that allows them to be cut up into pieces and their functionality breaks up appropriately. Cut of their wings and the part without the wings will fall, cut off their fuse and and the part without won't explode, etc.</p>
+      <br/>
+  
+      <h3>Dokuro3D [Software Renderer] (C++) (<a href="https://github.com/bombpersons/Dokuro3D">github page</a>)</h3>
+      <iframe width="640" height="360" src="https://www.youtube.com/embed/nUhEk0YRtM0" frameborder="0" allowfullscreen></iframe>
+      <p>A software renderer written for a university module in our second year, using the win32 API and GDI.</p>
+      <br/>
+  
+      <h3>2D shooter with STRIPS planning AI (C++, SFML) (<a href="https://github.com/bombpersons/STRIPS_AI_Shooter">github page</a>)</h3>
+      <iframe width="640" height="360" src="https://www.youtube.com/embed/KUACU25uvIA" frameborder="0" allowfullscreen></iframe>
+      <p>As part of an AI module in the final year, I created this simple 2D shooter as a test for implementing AI planning (based on GOAP originally used in F.E.A.R). The goal was to have a top down arena style shooter with AI that would duck for cover, acquire amnunition and health, and seek out and eliminate competition.</p>
+      <br/>
+  
+      <h2>Pillowdrift (2012-2013) (<a href="http://pillowdrift.com">site</a>)</h2>
+      <p>As part of a year of work experience during my university degree, myself and 3 other friends got together and created our own games company.</p>
+      <br/>
+  
+      <h3>Mega Driller Mole (Java, libGDX) (<a href="https://play.google.com/store/apps/details?id=com.pillowdrift.drillergame">android</a>) (<a href="http://pillowdrift.com/downloads/MegaDrillerMolePC.jar">windows/mac/linux</a>)</h3>
+      <iframe width="640" height="360" src="https://www.youtube.com/embed/bYb1vm5-DYE" frameborder="0" allowfullscreen></iframe>
+      <p>Our first game release, dig for gems with your drill whilst avoiding demons, mines, worms and worse to surface and deposit your treasure into the train following you above. Gain bonus points for getting more height.</p>
+      <br/>
+  
+      <h3>Stellar Swing (Stellar Void) (C#, Unity3D) (<a href="https://play.google.com/store/apps/details?id=com.pillowdrift.stellarswing&hl=en_GB">android</a>) (<a href="http://pillowdrift.com/downloads/stellarswing-windows.zip">windows</a>)</h3>
+      <iframe width="640" height="360" src="https://www.youtube.com/embed/8TPKQu8jN64" frameborder="0" allowfullscreen></iframe>
+      <p>Our second game release, play as a mining drone with a laser grapple and swing your way to the end of the level.</p>
+      <br/>
+  
+      <h3>Rocket Dodger (C#, Unity3D) (<a href="https://github.com/bombpersons/RocketDodger">github page</a>) (<a href="https://bombpersons.github.io/RocketDodger/">play online</a>)</h3>
+      <p>A small mobile game we didn't have enough time to finish during our years work experience. A fun little game in which the goal is to avoid being hit by heat seeking rockets. Gain boost by doing risky / cool things such as getting close misses, rockets closely tailing you or even destroying rockets by allowing them to crash into each other.</p>
+      <p>
+      Click and drag with your mouse to move your player around, hold right click to use your boost.
+      </p>
+      </br>
+  
+      <h3>Loyd's Tale [Ludum Dare] (C#, XNA) (<a href="https://www.dropbox.com/s/yedqvsblpspw3ta/LoydsTale.zip?dl=0">download</a>) (<a href="http://ludumdare.com/compo/ludum-dare-22/?action=preview&uid=8218">ludum dare</a>)</h3>
+      <p>A short 2D platformer game made in 48 hours.</p>
+    </div>
   </body>
 </html>

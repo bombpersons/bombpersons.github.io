@@ -11,6 +11,7 @@ body {
   color: #F3F3F3;
   font-family: monospace;
   text-align: center;
+  font-size: 16;
 }
 
 a {
@@ -27,5 +28,6 @@ h2 {
 }
 
 .content {
-  width: 700px;
+  width: 1500px;
+  margin: 0 auto;
 }

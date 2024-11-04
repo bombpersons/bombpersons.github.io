@@ -11,7 +11,7 @@ body {
   color: #F3F3F3;
   font-family: monospace;
   text-align: center;
-  font-size: 16;
+  font-size: 16pt;
 }
 
 a {
@@ -25,6 +25,11 @@ h1 {
 
 h2 {
   column-span: all;
+}
+
+h3 {
+  font-size: 26pt;
+  font-weight: bolder;
 }
 
 .content {

@@ -1,19 +1,34 @@
-{% extends "base.html" %}
-{% block title %}{{ section.title }} &middot; {{ config.title }}{% endblock %}
-{% block description %}{{ section.description | default(value=config.description) }}{% endblock %}
-{% block content %}
+{% set page_title = section.title ~ " · " ~ config.title %}
+{% set page_description = section.description | default(value=config.description) %}
+{% include "partials/header.html" %}
 <h1>{{ section.title }}</h1>
 {{ section.content | safe }}
 
-<ul class="post-list">
+{% if section.pages | length == 0 %}
+<p><em>Nothing planted here yet.</em></p>
+{% else %}
+<div class="packets">
   {% for page in section.pages %}
-  <li>
-    <span class="post-date">{{ page.date | date(format='%Y-%m-%d') }}</span>
-    <a href="{{ page.permalink }}">{{ page.title }}</a>
-    {% if page.summary %}<p class="post-summary">{{ page.summary | safe }}</p>{% endif %}
-  </li>
+  {% set l = page.title | length %}
+  {% set n = l % 4 %}
+  {% if n == 0 %}
+    {% set crop_name = "carrot" %}
+  {% elif n == 1 %}
+    {% set crop_name = "tomato" %}
+  {% elif n == 2 %}
+    {% set crop_name = "pea" %}
   {% else %}
-  <li><em>Nothing here yet.</em></li>
+    {% set crop_name = "pumpkin" %}
+  {% endif %}
+  <article class="packet">
+    {{ <crop name={crop_name} /> }}
+    <div>
+      <a class="packet-title" href="{{ page.permalink }}">{{ page.title }}</a>
+      <span class="sown">sown on {{ page.date | date(format='%Y-%m-%d') }}</span>
+      {% if page.summary %}<p>{{ page.summary | safe }}</p>{% endif %}
+    </div>
+  </article>
   {% endfor %}
-</ul>
-{% endblock %}
+</div>
+{% endif %}
+{% include "partials/footer.html" %}

@@ -1,22 +1,40 @@
-{% extends "base.html" %}
-{% block content %}
+{% set page_title = config.title %}
+{% include "partials/header.html" %}
 <section class="intro">
   {{ section.content | safe }}
 </section>
+
+<div class="patch" aria-label="Currently in season">
+  {% set m = now() | date(format='%m') %}
+  {% if m == "03" or m == "04" or m == "05" %}
+    {% set crop_name = "pea" %}{% set crop_label = "Peas" %}
+  {% elif m == "06" or m == "07" or m == "08" %}
+    {% set crop_name = "tomato" %}{% set crop_label = "Tomatoes" %}
+  {% elif m == "09" or m == "10" or m == "11" %}
+    {% set crop_name = "pumpkin" %}{% set crop_label = "Pumpkins" %}
+  {% else %}
+    {% set crop_name = "leek" %}{% set crop_label = "Leeks" %}
+  {% endif %}
+  {{ <crop name={crop_name} /> }}
+  <div>
+    <span class="patch-label">Now growing</span>
+    <span class="patch-name">{{ crop_label }}</span>
+  </div>
+</div>
+
+{{ <veg_divider /> }}
 
 {% set blog = get_section(path="blog/_index.md") %}
 {% if blog.pages | length > 0 %}
 <h2>Recent posts</h2>
 <ul class="post-list">
-  {% for page in blog.pages %}
-  {% if loop.index <= 5 %}
+  {% for page in blog.pages[:5] %}
   <li>
     <span class="post-date">{{ page.date | date(format='%Y-%m-%d') }}</span>
     <a href="{{ page.permalink }}">{{ page.title }}</a>
     {% if page.summary %}<p class="post-summary">{{ page.summary | safe }}</p>{% endif %}
   </li>
-  {% endif %}
   {% endfor %}
 </ul>
 {% endif %}
-{% endblock %}
+{% include "partials/footer.html" %}

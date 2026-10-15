@@ -1,7 +1,6 @@
-{% extends "base.html" %}
-{% block title %}{{ page.title }} &middot; {{ config.title }}{% endblock %}
-{% block description %}{{ page.description | default(value=config.description) }}{% endblock %}
-{% block content %}
+{% set page_title = page.title ~ " · " ~ config.title %}
+{% set page_description = page.description | default(value=config.description) %}
+{% include "partials/header.html" %}
 <article>
   <h1>{{ page.title }}</h1>
   {% if page.date %}<p class="post-date">{{ page.date | date(format='%Y-%m-%d') }}</p>{% endif %}
@@ -10,6 +9,6 @@
 
 <nav class="post-nav">
   {% if page.lower %}<a href="{{ page.lower.permalink }}">&larr; {{ page.lower.title }}</a>{% endif %}
-  {% if page.higher %}<span class="spacer"></span><a href="{{ page.higher.permalink }}">{{ page.higher.title }} &rarr;</a>{% endif %}
+  {% if page.higher %}<a href="{{ page.higher.permalink }}">{{ page.higher.title }} &rarr;</a>{% endif %}
 </nav>
-{% endblock %}
+{% include "partials/footer.html" %}

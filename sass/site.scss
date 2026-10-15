@@ -1,16 +1,61 @@
-// Palette carried over from the old site
-$bg: #17211E;
-$fg: #F3F3F3;
-$muted: #9AAFA8;
-$accent: #F5853F;
+// ============================================================
+//  maisy.land — the garden
+//  Day: seed-packet almanac. Night: the plot after dark.
+// ============================================================
 
+// ---------- theme tokens ----------
+:root {
+  color-scheme: light;
+
+  --bg: #F7F1E3;            // cream paper
+  --bg-soft: #EFE6CF;       // cards, code blocks
+  --ink: #33422F;           // ink-green text
+  --ink-muted: #6B7A63;
+  --accent: #C75B1E;        // carrot / terracotta (links)
+  --accent-strong: #E8752A;
+  --leaf: #4A7856;
+  --line: rgba(51, 66, 47, 0.25);
+  --wood: #6E4E33;          // crate / fence wood
+  --card: #FBF6E9;          // seed packet paper
+  --soil: #7A5C43;
+  --soil-dark: #5C4232;
+  --pond: #7FB4C7;
+  --pond-light: #A5CDD9;
+  --sky: #EDE3CB;
+  --chip: #EFE6CF;
+  --glow: none;
+}
+
+[data-theme="night"] {
+  color-scheme: dark;
+
+  --bg: #17211E;            // forest floor at night
+  --bg-soft: #1E2B26;
+  --ink: #F3F3F3;
+  --ink-muted: #9AAFA8;
+  --accent: #F5853F;        // ripe tomato, glowing
+  --accent-strong: #F5853F;
+  --leaf: #7FA982;
+  --line: rgba(243, 243, 243, 0.22);
+  --wood: #8B6748;
+  --card: #1E2B26;
+  --soil: #241E17;
+  --soil-dark: #171310;
+  --pond: #2E4A56;
+  --pond-light: #3D6170;
+  --sky: #121A17;
+  --chip: #24322C;
+  --glow: drop-shadow(0 0 6px rgba(245, 133, 63, 0.45));
+}
+
+// ---------- base ----------
 * {
   box-sizing: border-box;
 }
 
 body {
-  background-color: $bg;
-  color: $fg;
+  background-color: var(--bg);
+  color: var(--ink);
   font-family: ui-monospace, "Cascadia Mono", "Source Code Pro", Menlo, Consolas, monospace;
   font-size: 1.05rem;
   line-height: 1.65;
@@ -18,45 +63,22 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  max-width: 760px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 1.25rem 1rem 0;
-
-  .site-title {
-    color: $accent;
-    font-weight: bold;
-    text-decoration: none;
-  }
-
-  .nav-links a {
-    margin-left: 1rem;
-  }
-}
-
-.content {
-  flex: 1;
-  max-width: 760px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 1rem 1rem 3rem;
-}
-
-h1, h2, h3, h4 {
-  color: $accent;
-  line-height: 1.25;
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
 a {
-  color: $accent;
+  color: var(--accent);
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+
+  &:hover {
+    color: var(--accent-strong);
+  }
+}
+
+h1, h2, h3, h4 {
+  color: var(--accent);
+  line-height: 1.25;
 }
 
 img {
@@ -64,21 +86,113 @@ img {
   height: auto;
 }
 
-iframe {
-  max-width: 100%;
-  border: 0;
+// ---------- pixel sprites ----------
+svg.px {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+
+  rect {
+    shape-rendering: crispEdges;
+  }
 }
 
+.px-egg {
+  width: 18px;
+}
+
+// ---------- nav ----------
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.1rem 1rem 0;
+
+  .site-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--accent);
+    font-weight: bold;
+    text-decoration: none;
+
+    svg {
+      filter: var(--glow);
+    }
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    a {
+      color: var(--ink);
+
+      &:hover {
+        color: var(--accent);
+      }
+    }
+  }
+}
+
+#theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  background: transparent;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  cursor: pointer;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    border-color: var(--accent);
+  }
+}
+
+.icon-sun,
+.icon-moon {
+  display: inline-flex;
+  line-height: 0;
+}
+
+[data-theme="day"] .icon-sun { display: none; }
+[data-theme="night"] .icon-moon { display: none; }
+
+// ---------- layout ----------
+.content {
+  flex: 1;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+}
+
+// ---------- prose ----------
 pre {
   overflow-x: auto;
   padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: var(--bg-soft);
+  border: 1px solid var(--line);
 }
 
 code {
-  background-color: rgba(255, 255, 255, 0.07);
+  background-color: var(--bg-soft);
   padding: 0.1em 0.35em;
   border-radius: 3px;
+  font-size: 0.9em;
 }
 
 pre code {
@@ -87,29 +201,257 @@ pre code {
 }
 
 blockquote {
-  border-left: 3px solid $accent;
+  border-left: 3px solid var(--accent);
   margin-left: 0;
   padding-left: 1rem;
-  color: $muted;
+  color: var(--ink-muted);
 }
 
+// ---------- veg divider ----------
+.veg-divider {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 2.5rem 0;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    border-top: 2px dotted var(--line);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// ---------- the patch (now growing) ----------
+.patch {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 3px solid var(--wood);
+  background: var(--card);
+  padding: 0.9rem 1.1rem;
+  margin: 1.5rem 0;
+  max-width: 420px;
+
+  .px {
+    width: 48px;
+    height: 48px;
+    filter: var(--glow);
+  }
+
+  .patch-label {
+    display: block;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .patch-name {
+    font-weight: bold;
+    color: var(--ink);
+  }
+}
+
+// ---------- seed packets (blog cards) ----------
 .post-list {
   list-style: none;
   padding: 0;
+  margin: 1.5rem 0;
 
-  li {
-    margin-bottom: 1.25rem;
+  > li {
+    margin-bottom: 1rem;
   }
 }
 
 .post-date {
-  color: $muted;
+  color: var(--ink-muted);
   margin-right: 0.5rem;
 }
 
 .post-summary {
-  color: $muted;
+  color: var(--ink-muted);
   margin: 0.25rem 0 0;
+}
+
+.packets {
+  display: grid;
+  gap: 1.1rem;
+  margin: 1.5rem 0;
+}
+
+.packet {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  border: 3px solid var(--wood);
+  background: var(--card);
+  padding: 0.9rem 1.1rem;
+  transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.35s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 1px solid var(--wood);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  &:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  > .px {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    margin-top: 0.2rem;
+  }
+
+  .packet-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+
+  .sown {
+    display: block;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.15rem;
+  }
+
+  p {
+    margin: 0.4rem 0 0;
+    color: var(--ink-muted);
+  }
+}
+
+// ---------- raised beds (portfolio) ----------
+.beds {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0 2.5rem;
+}
+
+.crop-tile {
+  position: relative;
+  border: 3px solid var(--wood);
+  background: var(--card);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.35s ease;
+
+  &:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  > .px {
+    width: 48px;
+    height: 48px;
+    filter: var(--glow);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+
+    a {
+      color: var(--ink);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--accent);
+      }
+    }
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 0.92rem;
+  }
+}
+
+// ---------- chips + stage badges ----------
+.chip {
+  display: inline-block;
+  background: var(--chip);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0.05rem 0.45rem;
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin-right: 0.35rem;
+}
+
+.stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.project-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.button {
+  display: inline-block;
+  border: 2px solid var(--wood);
+  background: var(--card);
+  color: var(--ink);
+  padding: 0.25rem 0.8rem;
+  text-decoration: none;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  font-size: 0.92rem;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+iframe {
+  max-width: 100%;
+  border: 0;
+}
+
+.video {
+  margin: 1.5rem 0;
+
+  iframe {
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 16 / 9;
+    height: auto;
+  }
 }
 
 .post-nav {
@@ -117,18 +459,272 @@ blockquote {
   justify-content: space-between;
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 1px dotted rgba(255, 255, 255, 0.25);
+  border-top: 1px dotted var(--line);
 }
 
+// ---------- footer: the farmyard scene ----------
 footer {
-  max-width: 760px;
   width: 100%;
+}
+
+.scene {
+  position: relative;
+  height: 96px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
-  color: $muted;
+  background-color: var(--soil);
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 12px, rgba(0, 0, 0, 0.09) 12px 14px),
+    repeating-linear-gradient(0deg, transparent 0 14px, rgba(0, 0, 0, 0.07) 14px 16px);
+  border-top: 4px solid var(--soil-dark);
+  border-radius: 6px 6px 0 0;
+  overflow: hidden;
+  transition: background-color 0.35s ease;
+}
+
+.pond {
+  position: absolute;
+  right: 24px;
+  bottom: 10px;
+  width: 200px;
+  height: 30px;
+  background: var(--pond);
+  border-top: 3px solid var(--pond-light);
+  border-radius: 4px;
+  transition: background-color 0.35s ease;
+}
+
+.duck {
+  position: absolute;
+  right: 130px;
+  bottom: 18px;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    animation: bob 3s steps(2, end) infinite;
+  }
+}
+
+.ripple {
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 34px;
+  height: 10px;
+  margin-left: -17px;
+  border: 2px solid var(--pond-light);
+  border-radius: 50%;
+  opacity: 0;
+  animation: ripple 3.2s ease-out infinite;
+}
+
+.ripple.r2 {
+  animation-delay: 1.6s;
+}
+
+.hen {
+  position: absolute;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    image-rendering: pixelated;
+  }
+}
+
+.hen-walk {
+  left: 12%;
+  bottom: 6px;
+  animation: stroll 14s ease-in-out infinite alternate;
+
+  .hen-up,
+  .hen-down {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+  }
+
+  .hen-down {
+    opacity: 0;
+  }
+
+  .hen-up svg,
+  .hen-down svg {
+    animation: peck 5s steps(1, end) infinite;
+  }
+}
+
+.hen-sleep {
+  left: 12%;
+  bottom: 6px;
+  cursor: default;
+
+  .zzz {
+    position: absolute;
+    top: -14px;
+    left: 20px;
+    color: var(--ink-muted);
+    font-size: 0.7rem;
+    animation: float-zzz 4s ease-in-out infinite;
+  }
+}
+
+.egg-pop {
+  position: absolute;
+  left: 26px;
+  bottom: 0;
+  opacity: 0;
+  pointer-events: none;
+
+  &.popping {
+    animation: egg-pop 1.6s ease-out;
+  }
+}
+
+.fireflies {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+[data-theme="night"] .fireflies {
+  display: block;
+
+  i {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #F5D76E;
+    box-shadow: 0 0 6px 2px rgba(245, 215, 110, 0.55);
+    animation: firefly 9s ease-in-out infinite;
+  }
+
+  i:nth-child(1) { left: 30%; bottom: 30%; animation-delay: 0s; }
+  i:nth-child(2) { left: 55%; bottom: 55%; animation-delay: -3s; animation-duration: 11s; }
+  i:nth-child(3) { left: 70%; bottom: 25%; animation-delay: -6s; animation-duration: 8s; }
+  i:nth-child(4) { left: 42%; bottom: 45%; animation-delay: -1.5s; animation-duration: 12s; }
+}
+
+.night-only,
+.day-only {
+  display: none;
+}
+
+[data-theme="night"] .night-only { display: inline-flex; }
+[data-theme="night"] .hen-walk { display: none; }
+[data-theme="day"] .day-only { display: inline-flex; }
+
+.colophon {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0.9rem 1rem 1.2rem;
+  color: var(--ink-muted);
   font-size: 0.85rem;
 
   p {
     margin: 0;
+  }
+}
+
+// ---------- 404 ----------
+.fence {
+  height: 52px;
+  max-width: 420px;
+  margin: 2rem 0 1rem;
+  background:
+    repeating-linear-gradient(90deg, var(--wood) 0 12px, transparent 12px 18px);
+  border-top: 5px solid var(--wood);
+  border-bottom: 5px solid var(--wood);
+  opacity: 0.85;
+}
+
+.scratched {
+  position: relative;
+  height: 72px;
+  background-color: var(--soil);
+  border-radius: 4px;
+  overflow: visible;
+
+  .hen {
+    bottom: 4px;
+  }
+
+  .hen-escaped {
+    left: 15%;
+
+    svg {
+      transform: scaleX(-1);
+    }
+  }
+
+  .hen-pecking {
+    left: 55%;
+
+    svg {
+      animation: peck 3s steps(1, end) infinite;
+    }
+  }
+}
+
+// ---------- keyframes ----------
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.5); opacity: 0.8; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes peck {
+  0%, 69% { transform: translateY(0); }
+  70%, 79% { transform: translateY(3px); }
+  80%, 89% { transform: translateY(0); }
+  90%, 94% { transform: translateY(3px); }
+  95%, 100% { transform: translateY(0); }
+}
+
+@keyframes stroll {
+  0% { margin-left: 0; }
+  100% { margin-left: 9vw; }
+}
+
+@keyframes float-zzz {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes egg-pop {
+  0% { opacity: 0; transform: translateY(-10px); }
+  25% { opacity: 1; transform: translateY(0); }
+  75% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(0); }
+}
+
+@keyframes firefly {
+  0%, 100% { transform: translate(0, 0); opacity: 0; }
+  20% { opacity: 1; }
+  50% { transform: translate(24px, -18px); opacity: 0.9; }
+  80% { opacity: 0.6; }
+}
+
+// ---------- small screens ----------
+@media (max-width: 480px) {
+  .pond {
+    width: 140px;
+  }
+
+  .duck {
+    right: 80px;
+  }
+
+  .beds {
+    grid-template-columns: 1fr;
   }
 }

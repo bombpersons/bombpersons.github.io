@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title | default(value=config.title) }}</title>
+  <meta name="description" content="{{ page_description | default(value=config.description) }}">
+  <link rel="icon" type="image/svg+xml" href="{{ get_url(path='favicon.svg') }}">
+  <script>
+    // Set theme before first paint: localStorage choice, else OS preference
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t !== 'day' && t !== 'night') {
+        t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
+      }
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+  <link rel="stylesheet" href="{{ get_url(path='site.css', cachebust=true) }}">
+  <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path=config.feed_filenames | first) }}">
+</head>
+<body>
+  <nav>
+    <a class="site-title" href="{{ config.base_url }}">{{ <carrot /> }}<span>{{ config.title }}</span></a>
+    <div class="nav-links">
+      <a href="{{ get_url(path='@/blog/_index.md') }}">blog</a>
+      <a href="{{ get_url(path='@/portfolio/_index.md') }}">portfolio</a>
+      <a href="{{ get_url(path=config.extra.old_site_url) }}">old site</a>
+      <a href="{{ get_url(path=config.feed_filenames | first) }}">feed</a>
+      <button id="theme-toggle" type="button" aria-label="Toggle day/night theme">
+        <span class="icon-sun">{{ <sun /> }}</span>
+        <span class="icon-moon">{{ <moon /> }}</span>
+      </button>
+    </div>
+  </nav>
+  <main class="content">

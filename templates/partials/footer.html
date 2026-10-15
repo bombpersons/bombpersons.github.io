@@ -1,0 +1,59 @@
+  </main>
+  <footer>
+    <div class="scene" aria-hidden="true">
+      <div class="fireflies"><i></i><i></i><i></i><i></i></div>
+      <div class="pond">
+        <span class="duck">{{ <duck /> }}
+          <i class="ripple r1"></i><i class="ripple r2"></i>
+        </span>
+      </div>
+      <button class="hen hen-walk" id="hen" type="button" aria-label="A hen. Click her.">
+        <span class="hen-up">{{ <hen /> }}</span>
+        <span class="hen-down">{{ <hen_peck /> }}</span>
+        <span class="egg-pop" id="egg-pop">{{ <egg /> }}</span>
+      </button>
+      <span class="hen hen-sleep night-only">{{ <hen_roost /> }}<span class="zzz">z z z</span></span>
+    </div>
+    <div class="colophon">
+      <p>&copy; {{ now() | date(format='%Y') }} {{ config.extra.author }} &middot;
+        <a href="{{ config.extra.github_url }}">github</a> &middot;
+        grown with <a href="https://www.getzola.org">Zola</a>
+        &middot; <span id="egg-count"></span></p>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var btn = document.getElementById('theme-toggle');
+      btn.addEventListener('click', function () {
+        var t = root.dataset.theme === 'night' ? 'day' : 'night';
+        root.dataset.theme = t;
+        localStorage.setItem('theme', t);
+      });
+
+      // the hen lays an egg when clicked
+      var hen = document.getElementById('hen');
+      var pop = document.getElementById('egg-pop');
+      var counter = document.getElementById('egg-count');
+      function eggCount() { return parseInt(localStorage.getItem('eggs') || '0', 10); }
+      function showCount() {
+        var n = eggCount();
+        counter.textContent = n > 0 ? 'eggs laid: ' + n : '';
+      }
+      showCount();
+      hen.addEventListener('click', function () {
+        if (root.dataset.theme === 'night') {
+          counter.textContent = 'shh, she\u2019s sleeping';
+          setTimeout(showCount, 2000);
+          return;
+        }
+        pop.classList.remove('popping');
+        void pop.offsetWidth;
+        pop.classList.add('popping');
+        localStorage.setItem('eggs', String(eggCount() + 1));
+        setTimeout(showCount, 1200);
+      });
+    })();
+  </script>
+</body>
+</html>

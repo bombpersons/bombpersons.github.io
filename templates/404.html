@@ -1,6 +1,12 @@
-{% extends "base.html" %}
-{% block title %}404 &middot; {{ config.title }}{% endblock %}
-{% block content %}
+{% set page_title = "404 · " ~ config.title %}
+{% include "partials/header.html" %}
 <h1>404</h1>
-<p>Nothing here. <a href="{{ config.base_url }}">Go home?</a></p>
-{% endblock %}
+<p>Something&rsquo;s been scratching around here &mdash; this bed is empty.
+<a href="{{ config.base_url }}">Back to the plot?</a></p>
+
+<div class="fence" aria-hidden="true"></div>
+<div class="scratched" aria-hidden="true">
+  <span class="hen hen-escaped">{{ <hen /> }}</span>
+  <span class="hen hen-pecking">{{ <hen_peck /> }}</span>
+</div>
+{% include "partials/footer.html" %}

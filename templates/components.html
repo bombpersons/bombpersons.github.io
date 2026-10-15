@@ -1,0 +1,275 @@
+{#- Pixel art sprite components. All sprites are inline SVGs on a 16x16 grid.
+    Globally registered by Zola - invoke with e.g. {{ <carrot /> }} -#}
+
+{#- ---------- crops - -#}
+
+{% component carrot() %}
+<svg class="px" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="7" y="0" width="2" height="2" fill="#6FA075"/>
+  <rect x="4" y="1" width="2" height="2" fill="#4A7856"/>
+  <rect x="10" y="1" width="2" height="2" fill="#4A7856"/>
+  <rect x="6" y="2" width="4" height="1" fill="#4A7856"/>
+  <rect x="5" y="3" width="6" height="3" fill="#E8752A"/>
+  <rect x="5" y="4" width="6" height="1" fill="#C65A20"/>
+  <rect x="5" y="6" width="6" height="2" fill="#E8752A"/>
+  <rect x="6" y="8" width="4" height="2" fill="#E8752A"/>
+  <rect x="6" y="9" width="4" height="1" fill="#C65A20"/>
+  <rect x="7" y="10" width="2" height="2" fill="#E8752A"/>
+  <rect x="7" y="12" width="1" height="2" fill="#E8752A"/>
+</svg>
+{% endcomponent carrot %}
+
+{% component tomato() %}
+<svg class="px" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="7" y="1" width="2" height="1" fill="#4A7856"/>
+  <rect x="6" y="2" width="1" height="1" fill="#4A7856"/>
+  <rect x="9" y="2" width="1" height="1" fill="#4A7856"/>
+  <rect x="7" y="2" width="2" height="1" fill="#6FA075"/>
+  <rect x="4" y="3" width="8" height="1" fill="#C94F3D"/>
+  <rect x="3" y="4" width="10" height="7" fill="#C94F3D"/>
+  <rect x="4" y="11" width="8" height="1" fill="#C94F3D"/>
+  <rect x="4" y="4" width="2" height="2" fill="#E2735B"/>
+</svg>
+{% endcomponent tomato %}
+
+{% component pumpkin() %}
+<svg class="px" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="7" y="1" width="2" height="2" fill="#4A7856"/>
+  <rect x="10" y="2" width="1" height="1" fill="#6FA075"/>
+  <rect x="4" y="3" width="8" height="1" fill="#E07B2A"/>
+  <rect x="3" y="4" width="10" height="7" fill="#E07B2A"/>
+  <rect x="4" y="11" width="8" height="1" fill="#E07B2A"/>
+  <rect x="5" y="4" width="1" height="7" fill="#B85E1B"/>
+  <rect x="8" y="4" width="1" height="7" fill="#B85E1B"/>
+  <rect x="4" y="4" width="1" height="2" fill="#F0A05A"/>
+</svg>
+{% endcomponent pumpkin %}
+
+{% component pea() %}
+<svg class="px" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="7" y="1" width="1" height="3" fill="#6FA075"/>
+  <rect x="9" y="2" width="1" height="1" fill="#6FA075"/>
+  <rect x="5" y="3" width="2" height="1" fill="#4A7856"/>
+  <rect x="9" y="4" width="2" height="1" fill="#4A7856"/>
+  <rect x="4" y="7" width="8" height="1" fill="#8FBE6E"/>
+  <rect x="4" y="8" width="8" height="2" fill="#6FA075"/>
+  <rect x="6" y="8" width="1" height="1" fill="#4A7856"/>
+  <rect x="8" y="8" width="1" height="1" fill="#4A7856"/>
+  <rect x="10" y="8" width="1" height="1" fill="#4A7856"/>
+  <rect x="4" y="12" width="8" height="2" fill="#5C4232"/>
+  <rect x="3" y="13" width="10" height="1" fill="#4A3526"/>
+</svg>
+{% endcomponent pea %}
+
+{% component leek() %}
+<svg class="px" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="4" y="1" width="3" height="5" fill="#4A7856"/>
+  <rect x="9" y="1" width="3" height="5" fill="#4A7856"/>
+  <rect x="6" y="3" width="4" height="3" fill="#6FA075"/>
+  <rect x="7" y="6" width="2" height="6" fill="#EFE9D4"/>
+  <rect x="8" y="6" width="1" height="6" fill="#D9CFAF"/>
+  <rect x="5" y="12" width="6" height="2" fill="#5C4232"/>
+</svg>
+{% endcomponent leek %}
+
+{% component orange() %}
+<svg class="px" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="8" y="2" width="2" height="1" fill="#4A7856"/>
+  <rect x="7" y="3" width="1" height="1" fill="#6E4E33"/>
+  <rect x="4" y="4" width="8" height="1" fill="#F09A3E"/>
+  <rect x="3" y="5" width="10" height="7" fill="#F09A3E"/>
+  <rect x="4" y="12" width="8" height="1" fill="#F09A3E"/>
+  <rect x="4" y="5" width="2" height="2" fill="#F7B96B"/>
+</svg>
+{% endcomponent orange %}
+
+{% component egg() %}
+<svg class="px px-egg" viewBox="0 0 8 10" aria-hidden="true" focusable="false">
+  <rect x="3" y="0" width="2" height="1" fill="#FBF7EC"/>
+  <rect x="2" y="1" width="4" height="2" fill="#FBF7EC"/>
+  <rect x="1" y="3" width="6" height="6" fill="#FBF7EC"/>
+  <rect x="2" y="9" width="4" height="1" fill="#E4D9C4"/>
+  <rect x="5" y="3" width="2" height="6" fill="#E4D9C4"/>
+  <rect x="4" y="2" width="2" height="1" fill="#E4D9C4"/>
+</svg>
+{% endcomponent egg %}
+
+{#- ---------- sky - -#}
+
+{% component sun() %}
+<svg class="px" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="7" y="0" width="2" height="2" fill="#E8A13F"/>
+  <rect x="7" y="14" width="2" height="2" fill="#E8A13F"/>
+  <rect x="0" y="7" width="2" height="2" fill="#E8A13F"/>
+  <rect x="14" y="7" width="2" height="2" fill="#E8A13F"/>
+  <rect x="2" y="2" width="2" height="2" fill="#E8A13F"/>
+  <rect x="12" y="2" width="2" height="2" fill="#E8A13F"/>
+  <rect x="2" y="12" width="2" height="2" fill="#E8A13F"/>
+  <rect x="12" y="12" width="2" height="2" fill="#E8A13F"/>
+  <rect x="5" y="3" width="6" height="1" fill="#F5C542"/>
+  <rect x="4" y="4" width="8" height="2" fill="#F5C542"/>
+  <rect x="3" y="6" width="10" height="4" fill="#F5C542"/>
+  <rect x="4" y="10" width="8" height="2" fill="#F5C542"/>
+  <rect x="5" y="12" width="6" height="1" fill="#F5C542"/>
+  <rect x="5" y="4" width="2" height="2" fill="#FBE38A"/>
+</svg>
+{% endcomponent sun %}
+
+{% component moon() %}
+<svg class="px" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <defs><mask id="mooncut">
+    <rect width="16" height="16" fill="#fff"/>
+    <rect x="9" y="0" width="7" height="2" fill="#000"/>
+    <rect x="8" y="2" width="8" height="2" fill="#000"/>
+    <rect x="7" y="4" width="9" height="6" fill="#000"/>
+    <rect x="8" y="10" width="8" height="2" fill="#000"/>
+    <rect x="9" y="12" width="7" height="2" fill="#000"/>
+  </mask></defs>
+  <g mask="url(#mooncut)" fill="#EFE6C0">
+    <rect x="5" y="1" width="4" height="1"/>
+    <rect x="4" y="2" width="5" height="2"/>
+    <rect x="3" y="4" width="4" height="8"/>
+    <rect x="4" y="12" width="5" height="2"/>
+    <rect x="5" y="14" width="4" height="1"/>
+  </g>
+</svg>
+{% endcomponent moon %}
+
+{#- ---------- the flock - -#}
+
+{% component hen() %}
+<svg class="px px-hen" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="7" y="1" width="2" height="2" fill="#C94F3D"/>
+  <rect x="6" y="2" width="4" height="4" fill="#FBF7EC"/>
+  <rect x="9" y="3" width="1" height="1" fill="#2B2B2B"/>
+  <rect x="10" y="4" width="2" height="1" fill="#E8A13F"/>
+  <rect x="9" y="6" width="1" height="1" fill="#C94F3D"/>
+  <rect x="5" y="5" width="6" height="2" fill="#FBF7EC"/>
+  <rect x="4" y="7" width="8" height="4" fill="#FBF7EC"/>
+  <rect x="2" y="6" width="2" height="4" fill="#E4D9C4"/>
+  <rect x="1" y="7" width="1" height="2" fill="#D9C89F"/>
+  <rect x="6" y="8" width="3" height="2" fill="#E4D9C4"/>
+  <rect x="6" y="11" width="1" height="3" fill="#E8A13F"/>
+  <rect x="9" y="11" width="1" height="3" fill="#E8A13F"/>
+  <rect x="5" y="14" width="2" height="1" fill="#E8A13F"/>
+  <rect x="9" y="14" width="2" height="1" fill="#E8A13F"/>
+</svg>
+{% endcomponent hen %}
+
+{% component hen_peck() %}
+<svg class="px px-hen" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="9" y="4" width="2" height="1" fill="#C94F3D"/>
+  <rect x="9" y="5" width="3" height="3" fill="#FBF7EC"/>
+  <rect x="10" y="6" width="1" height="1" fill="#2B2B2B"/>
+  <rect x="12" y="7" width="2" height="1" fill="#E8A13F"/>
+  <rect x="5" y="5" width="6" height="2" fill="#FBF7EC"/>
+  <rect x="4" y="7" width="8" height="4" fill="#FBF7EC"/>
+  <rect x="2" y="6" width="2" height="4" fill="#E4D9C4"/>
+  <rect x="6" y="8" width="3" height="2" fill="#E4D9C4"/>
+  <rect x="6" y="11" width="1" height="3" fill="#E8A13F"/>
+  <rect x="9" y="11" width="1" height="3" fill="#E8A13F"/>
+  <rect x="5" y="14" width="2" height="1" fill="#E8A13F"/>
+  <rect x="9" y="14" width="2" height="1" fill="#E8A13F"/>
+</svg>
+{% endcomponent hen_peck %}
+
+{% component hen_roost() %}
+<svg class="px px-hen" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="10" y="6" width="2" height="1" fill="#C94F3D"/>
+  <rect x="4" y="6" width="7" height="1" fill="#FBF7EC"/>
+  <rect x="3" y="7" width="9" height="5" fill="#FBF7EC"/>
+  <rect x="10" y="7" width="3" height="3" fill="#FBF7EC"/>
+  <rect x="11" y="8" width="1" height="1" fill="#2B2B2B"/>
+  <rect x="13" y="8" width="1" height="1" fill="#E8A13F"/>
+  <rect x="1" y="7" width="2" height="4" fill="#E4D9C4"/>
+  <rect x="5" y="9" width="4" height="2" fill="#E4D9C4"/>
+</svg>
+{% endcomponent hen_roost %}
+
+{% component duck() %}
+<svg class="px px-hen" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <rect x="8" y="3" width="4" height="4" fill="#FBF7EC"/>
+  <rect x="10" y="4" width="1" height="1" fill="#2B2B2B"/>
+  <rect x="12" y="5" width="2" height="1" fill="#E8A13F"/>
+  <rect x="8" y="7" width="3" height="1" fill="#FBF7EC"/>
+  <rect x="2" y="6" width="2" height="2" fill="#E4D9C4"/>
+  <rect x="3" y="8" width="10" height="4" fill="#FBF7EC"/>
+  <rect x="4" y="9" width="5" height="2" fill="#E4D9C4"/>
+</svg>
+{% endcomponent duck %}
+
+{#- ---------- growth stages (12x12 badges) - -#}
+
+{% component stage_germinating() %}
+<svg class="px px-stage" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+  <rect x="5" y="3" width="1" height="3" fill="#6FA075"/>
+  <rect x="6" y="3" width="2" height="1" fill="#4A7856"/>
+  <rect x="5" y="6" width="2" height="1" fill="#8A5A33"/>
+  <rect x="2" y="7" width="8" height="3" fill="#5C4232"/>
+  <rect x="1" y="9" width="10" height="1" fill="#4A3526"/>
+</svg>
+{% endcomponent stage_germinating %}
+
+{% component stage_growing() %}
+<svg class="px px-stage" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+  <rect x="3" y="4" width="2" height="1" fill="#4A7856"/>
+  <rect x="6" y="2" width="2" height="1" fill="#4A7856"/>
+  <rect x="5" y="3" width="1" height="5" fill="#6FA075"/>
+  <rect x="2" y="8" width="8" height="2" fill="#5C4232"/>
+  <rect x="1" y="9" width="10" height="1" fill="#4A3526"/>
+</svg>
+{% endcomponent stage_growing %}
+
+{% component stage_fruiting() %}
+<svg class="px px-stage" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+  <rect x="6" y="1" width="2" height="1" fill="#4A7856"/>
+  <rect x="5" y="2" width="1" height="6" fill="#6FA075"/>
+  <rect x="1" y="4" width="3" height="3" fill="#C94F3D"/>
+  <rect x="1" y="4" width="1" height="1" fill="#E2735B"/>
+  <rect x="2" y="8" width="8" height="2" fill="#5C4232"/>
+  <rect x="1" y="9" width="10" height="1" fill="#4A3526"/>
+</svg>
+{% endcomponent stage_fruiting %}
+
+{% component stage_harvested() %}
+<svg class="px px-stage" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+  <rect x="3" y="2" width="6" height="1" fill="#6E4E33"/>
+  <rect x="2" y="3" width="1" height="1" fill="#6E4E33"/>
+  <rect x="9" y="3" width="1" height="1" fill="#6E4E33"/>
+  <rect x="4" y="3" width="2" height="1" fill="#E8752A"/>
+  <rect x="2" y="4" width="8" height="4" fill="#8B6748"/>
+  <rect x="4" y="4" width="1" height="4" fill="#6E4E33"/>
+  <rect x="7" y="4" width="1" height="4" fill="#6E4E33"/>
+  <rect x="2" y="7" width="8" height="1" fill="#6E4E33"/>
+</svg>
+{% endcomponent stage_harvested %}
+
+{#- ---------- composite helpers - -#}
+
+{% component stage_badge(stage: string = "growing") %}
+<span class="stage">
+  {%- if stage == "germinating" -%}{{ <stage_germinating /> }}
+  {%- elif stage == "growing" -%}{{ <stage_growing /> }}
+  {%- elif stage == "fruiting" -%}{{ <stage_fruiting /> }}
+  {%- else -%}{{ <stage_harvested /> }}
+  {%- endif -%}
+  <span>{{ stage | capitalize }}</span>
+</span>
+{% endcomponent stage_badge %}
+
+{% component crop(name: string = "carrot") %}
+{%- if name == "tomato" -%}{{ <tomato /> }}
+{%- elif name == "pumpkin" -%}{{ <pumpkin /> }}
+{%- elif name == "pea" -%}{{ <pea /> }}
+{%- elif name == "leek" -%}{{ <leek /> }}
+{%- elif name == "orange" -%}{{ <orange /> }}
+{%- elif name == "egg" -%}{{ <egg /> }}
+{%- else -%}{{ <carrot /> }}
+{%- endif -%}
+{% endcomponent crop %}
+
+{% component veg_divider() %}
+<div class="veg-divider" aria-hidden="true">
+  {{ <carrot /> }}{{ <tomato /> }}{{ <pumpkin /> }}
+</div>
+{% endcomponent veg_divider %}

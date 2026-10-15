@@ -1,0 +1,30 @@
+{% set page_title = section.title ~ " · " ~ config.title %}
+{% set page_description = section.description | default(value=config.description) %}
+{% include "partials/header.html" %}
+<h1>{{ section.title }}</h1>
+{{ section.content | safe }}
+
+{% set groups = [ "personal", "university", "pillowdrift" ] %}
+{% set labels = [ "Personal Projects", "University Projects", "Pillowdrift (2012-2013)" ] %}
+{% for gb in groups %}
+  {% set group_pages = [page for page in section.pages if page.extra.group == gb] %}
+  {% if group_pages | length > 0 %}
+    <h2>{{ labels[loop.index0] }}</h2>
+    <div class="beds">
+      {% for page in group_pages %}
+      {% set c = page.extra.crop | default(value="carrot") %}
+      {% set st = page.extra.stage | default(value="growing") %}
+      <article class="crop-tile">
+        {{ <crop name={c} /> }}
+        <h3><a href="{{ page.permalink }}">{{ page.title }}</a></h3>
+        {{ <stage_badge stage={st} /> }}
+        <p>{{ page.description }}</p>
+        <span>
+          {% for t in page.extra.tech %}<span class="chip">{{ t }}</span>{% endfor %}
+        </span>
+      </article>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endfor %}
+{% include "partials/footer.html" %}

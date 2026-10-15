@@ -1,0 +1,33 @@
+{% set page_title = page.title ~ " · " ~ config.title %}
+{% set page_description = page.description | default(value=config.description) %}
+{% include "partials/header.html" %}
+<article>
+  <h1>{{ page.title }}</h1>
+
+  {% if page.extra.stage %}
+  <div class="project-meta">
+    {{ <stage_badge stage={page.extra.stage} /> }}
+    <span>
+      {% for t in page.extra.tech %}<span class="chip">{{ t }}</span>{% endfor %}
+    </span>
+  </div>
+  {% endif %}
+
+  {% if page.extra.links %}
+  <p class="project-links">
+    {% for l in page.extra.links %}<a class="button" href="{{ l.url }}">{{ l.name }}</a>{% endfor %}
+  </p>
+  {% endif %}
+
+  {% if page.extra.youtube %}
+  <div class="video">
+    <iframe width="640" height="360" src="https://www.youtube.com/embed/{{ page.extra.youtube }}"
+      title="{{ page.title }} video" allowfullscreen></iframe>
+  </div>
+  {% endif %}
+
+  {{ page.content | safe }}
+</article>
+
+{{ <veg_divider /> }}
+{% include "partials/footer.html" %}

@@ -4,6 +4,8 @@
 Each sprite is drawn at art resolution; the site displays them at 2x with
 image-rendering: pixelated, so one art pixel = 2 screen pixels — the same
 on-screen pixel size as the chicken and duck sprites (16px art at 32px).
+All sprites have their attachment stem at the bottom, so rotating them
++90 degrees on the left and -90 degrees on the right puts stems outside.
 
 Usage: python3 tools/make_side_plants.py
 Output: static/images/plants/*.png
@@ -11,6 +13,7 @@ Output: static/images/plants/*.png
 
 import math
 import os
+import tempfile
 
 from PIL import Image
 
@@ -198,6 +201,8 @@ def apple_fruit():
     rot_paste(im, leaflet, -20, 17, 3)
     rect(im, 7, 16, 3, 5, RED_L)
     outline(im, RED_O)
+    # attachment (stem) must sit at the canvas bottom, like the leaves
+    im = im.transpose(Image.FLIP_TOP_BOTTOM)
     return im
 
 
@@ -260,6 +265,7 @@ def bean_pod():
     px(im, 14, 42, POD_D)
     px(im, 15, 43, POD_D)
     outline(im, POD_O)
+    im = im.transpose(Image.FLIP_TOP_BOTTOM)
     return im
 
 
@@ -316,6 +322,7 @@ def strawberry():
                    (13, 22), (17, 23), (15, 26)):
         rect(im, sx, sy, 1, 2, SEED)
     outline(im, RED_O)
+    im = im.transpose(Image.FLIP_TOP_BOTTOM)
     return im
 
 
@@ -388,8 +395,12 @@ def squash_leaf():
     rect(im, 12, 30, 4, 3, SQUASH_L)
     rect(im, 54, 32, 4, 3, SQUASH_L)
     rect(im, 28, 40, 4, 3, SQUASH_L)
-    rect(im, 34, 52, 5, 10, BEAN_D)
+    # Attach at the notch where the veins meet, then flip stem-down below.
+    rect(im, 34, 0, 5, 10, BEAN_D)
     outline(im, SQUASH_O)
+    # flip: notch + vein convergence belong at the stem end (the attachment),
+    # so the lobes fan inward when the leaf pokes from an edge
+    im = im.transpose(Image.FLIP_TOP_BOTTOM)
     return im
 
 
@@ -422,6 +433,7 @@ def pumpkin():
     rect(im, 8, 14, 3, 4, ORANGE_L)
     rect(im, 9, 18, 2, 2, ORANGE_L)
     outline(im, ORANGE_O)
+    im = im.transpose(Image.FLIP_TOP_BOTTOM)
     return im
 
 
@@ -434,6 +446,7 @@ def tomato():
     rect(im, 14, 2, 2, 4, (62, 107, 69))
     rect(im, 7, 12, 3, 4, RED_L)
     outline(im, RED_O)
+    im = im.transpose(Image.FLIP_TOP_BOTTOM)
     return im
 
 
@@ -479,8 +492,9 @@ def main():
         x = (i % cols) * cell_w + (cell_w - im.width) // 2
         y = (i // cols) * cell_h + (cell_h - im.height) // 2
         sheet.alpha_composite(im, (max(0, x), max(0, y)))
-    sheet.save("/tmp/opencode/plants_sheet.png")
-    print("sheet: /tmp/opencode/plants_sheet.png")
+    sheet_path = os.path.join(tempfile.gettempdir(), "maisy-land-plants.png")
+    sheet.save(sheet_path)
+    print(f"sheet: {os.path.abspath(sheet_path)}")
 
 
 if __name__ == "__main__":

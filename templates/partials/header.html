@@ -17,14 +17,8 @@
   <meta name="description" content="{{ page_description | default(value=config.description) }}">
   <link rel="icon" type="image/svg+xml" href="{{ get_url(path='favicon.svg') }}">
   <script>
-    // Apply theme + season before first paint
+    // Apply the season before first paint; sky.js sets the time-based lighting.
     (function () {
-      var t = localStorage.getItem('theme');
-      if (t !== 'day' && t !== 'night') {
-        t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
-      }
-      document.documentElement.dataset.theme = t;
-
       var sv = localStorage.getItem('season');
       var mm = (new Date()).getMonth() + 1;
       var auto = (mm >= 3 && mm <= 5) ? 'spring' : (mm >= 6 && mm <= 8) ? 'summer' : (mm >= 9 && mm <= 11) ? 'autumn' : 'winter';
@@ -32,10 +26,22 @@
       document.documentElement.dataset.season = valid.indexOf(sv) > -1 ? sv : auto;
     })();
   </script>
+  <script src="{{ get_url(path='sky.js', cachebust=true) }}"></script>
   <link rel="stylesheet" href="{{ get_url(path='site.css', cachebust=true) }}">
   <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path=config.feed_filenames | first) }}">
 </head>
 <body>
+  <div class="sky" aria-hidden="true">
+    <div class="sky-stars"></div>
+    <div class="sky-clouds">
+      {% for cloud in [1, 2, 3, 4, 5] %}
+      <svg class="sky-cloud cloud-{{ cloud }}" viewBox="0 0 120 40" focusable="false">
+        <path class="cloud-body" d="M0 28H8V20H24V12H36V4H56V0H72V8H84V16H100V20H112V28H120V36H108V40H12V36H0Z" />
+        <path class="cloud-shade" d="M0 28H12V32H36V36H84V32H108V28H120V36H108V40H12V36H0Z" />
+      </svg>
+      {% endfor %}
+    </div>
+  </div>
   <div class="falling-leaves" aria-hidden="true">
     <i><span>{{ <leaf /> }}</span></i>
     <i><span>{{ <leaf variant="b" /> }}</span></i>
@@ -65,10 +71,12 @@
         <button type="button" class="sp sp-autumn" data-set="autumn" aria-label="Autumn" title="Autumn">{{ <pumpkin /> }}</button>
         <button type="button" class="sp sp-winter" data-set="winter" aria-label="Winter" title="Winter">{{ <leek /> }}</button>
       </div>
-      <button id="theme-toggle" type="button" aria-label="Toggle day/night theme">
-        <span class="icon-sun">{{ <sun /> }}</span>
-        <span class="icon-moon">{{ <moon /> }}</span>
-      </button>
+      <div class="sky-control" hidden>
+        <label for="sky-time">Sky</label>
+        <input id="sky-time" type="range" min="0" max="1439" step="1" aria-describedby="sky-time-value">
+        <output id="sky-time-value" for="sky-time"></output>
+        <button id="sky-now" type="button" title="Follow the current local time">Now</button>
+      </div>
     </div>
   </nav>
   <main class="content">

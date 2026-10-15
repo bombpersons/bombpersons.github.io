@@ -19,11 +19,24 @@
   --card: #FBF6E9;          // seed packet paper
   --soil: #7A5C43;
   --soil-dark: #5C4232;
+  --turf: #638D48;
+  --turf-light: #88AD5B;
+  --turf-dark: #3F653A;
+  --pond-bed: #687660;
+  --pond-water: rgba(78, 158, 182, 0.42);
   --pond: #7FB4C7;
   --pond-light: #A5CDD9;
   --sky: #EDE3CB;
   --chip: #EFE6CF;
   --glow: none;
+  --sky-top: #77B8E3;
+  --sky-middle: #B6DDEE;
+  --sky-horizon: #E3EFDF;
+  --cloud-color: #FFFbed;
+  --cloud-shade: #BFD9E7;
+  --cloud-opacity: 0.82;
+  --star-opacity: 0;
+  --sky-wash: rgba(247, 241, 227, 0.45);
 }
 
 [data-theme="night"] {
@@ -41,11 +54,17 @@
   --card: #1E2B26;
   --soil: #241E17;
   --soil-dark: #171310;
+  --turf: #344E36;
+  --turf-light: #4C6845;
+  --turf-dark: #263E2C;
+  --pond-bed: #354238;
+  --pond-water: rgba(40, 88, 116, 0.5);
   --pond: #2E4A56;
   --pond-light: #3D6170;
   --sky: #121A17;
   --chip: #24322C;
   --glow: drop-shadow(0 0 6px rgba(245, 133, 63, 0.45));
+  --sky-wash: rgba(16, 23, 47, 0.7);
 }
 
 // ---------- base ----------
@@ -54,7 +73,8 @@
 }
 
 body {
-  background-color: var(--bg);
+  background-color: var(--sky-horizon);
+  isolation: isolate;
   color: var(--ink);
   font-family: ui-monospace, "Cascadia Mono", "Source Code Pro", Menlo, Consolas, monospace;
   font-size: 1.05rem;
@@ -64,6 +84,66 @@ body {
   flex-direction: column;
   min-height: 100vh;
   transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+// ---------- the sky ----------
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--sky-top), var(--sky-middle) 56%, var(--sky-horizon));
+
+  // A soft wash behind the reading area keeps twilight text legible.
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 660px 100% at 50% 40%, var(--sky-wash) 25%, transparent 100%);
+  }
+}
+
+.sky-stars {
+  position: absolute;
+  inset: 0;
+  opacity: var(--star-opacity);
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+}
+
+.sky-clouds {
+  position: absolute;
+  inset: 0;
+  opacity: var(--cloud-opacity);
+}
+
+.sky-cloud {
+  position: absolute;
+  left: -340px;
+  width: 240px;
+  height: auto;
+  shape-rendering: crispEdges;
+  animation: cloud-drift 210s linear infinite;
+
+  .cloud-body { fill: var(--cloud-color); }
+  .cloud-shade { fill: var(--cloud-shade); }
+}
+
+.cloud-1 { top: 7%; width: 264px; animation-delay: -38s; }
+.cloud-2 { top: 24%; width: 180px; animation-duration: 260s; animation-delay: -160s; }
+.cloud-3 { top: 41%; width: 312px; animation-duration: 300s; animation-delay: -100s; }
+.cloud-4 { top: 62%; width: 204px; animation-duration: 240s; animation-delay: -215s; }
+.cloud-5 { top: 79%; width: 156px; animation-duration: 280s; animation-delay: -66s; }
+
+@keyframes cloud-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100vw + 680px)); }
 }
 
 a {
@@ -156,11 +236,27 @@ img {
 // Planted by JS to fill the window height — see plantSides() in footer.html.
 .leafy {
   position: absolute;
+  max-width: none;
   height: auto;
   image-rendering: pixelated;
   display: inline-block;
-  transform-origin: center;
+  transform-origin: 50% 100%;
 }
+
+.side-vine {
+  position: absolute;
+  top: 0;
+  width: 18px;
+  height: 100%;
+  fill: none;
+  stroke: var(--lf-dark);
+  stroke-width: 3px;
+  opacity: 0.8;
+}
+
+.vines-l .side-vine { left: -8px; }
+.vines-r .side-vine { right: -8px; transform: scaleX(-1); }
+.plant-accent { z-index: 1; }
 
 .leafy.swaying {
   animation: side-sway var(--swd, 6s) ease-in-out infinite alternate;
@@ -304,6 +400,7 @@ nav {
 
   .nav-links {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 1rem;
 
@@ -317,25 +414,40 @@ nav {
   }
 }
 
-#theme-toggle {
+.sky-control {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 3px;
-  background: transparent;
-  border: 2px solid var(--line);
-  border-radius: 4px;
-  cursor: pointer;
+  gap: 0.45rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
 
-  svg {
-    width: 20px;
-    height: 20px;
+  input {
+    width: 92px;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
   }
 
-  &:hover {
-    border-color: var(--accent);
+  output {
+    min-width: 5ch;
+    font-variant-numeric: tabular-nums;
+  }
+
+  button {
+    padding: 2px 5px;
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font: inherit;
+    cursor: pointer;
+
+    &:disabled { opacity: 0.55; cursor: default; }
+    &:hover:not(:disabled) { border-color: var(--accent); }
   }
 }
+
+.sky-control[hidden] { display: none; }
 
 .season-picker {
   display: inline-flex;
@@ -376,15 +488,6 @@ nav {
   background-color: var(--chip);
   box-shadow: inset 0 -3px 0 var(--accent);
 }
-
-.icon-sun,
-.icon-moon {
-  display: inline-flex;
-  line-height: 0;
-}
-
-[data-theme="day"] .icon-sun { display: none; }
-[data-theme="night"] .icon-moon { display: none; }
 
 // ---------- layout ----------
 .content {
@@ -711,30 +814,102 @@ footer {
 }
 
 .scene {
+  --ground-depth: 116px;
+  --pond-width: clamp(132px, 22cqw, 320px);
+  --pond-right: 4cqw;
+  --pond-left: calc(100cqw - var(--pond-right) - var(--pond-width));
   position: relative;
-  height: 96px;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  height: 224px;
+  overflow: hidden;
+  isolation: isolate;
+  container-type: inline-size;
+}
+
+.ground {
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--ground-depth);
   background-color: var(--soil);
   background-image:
-    repeating-linear-gradient(90deg, transparent 0 12px, rgba(0, 0, 0, 0.09) 12px 14px),
-    repeating-linear-gradient(0deg, transparent 0 14px, rgba(0, 0, 0, 0.07) 14px 16px);
-  border-top: 4px solid var(--soil-dark);
-  border-radius: 6px 6px 0 0;
-  overflow: hidden;
+    url("images/soil-texture.svg"),
+    linear-gradient(to bottom, transparent 25%, rgba(20, 14, 10, 0.26));
   transition: background-color 0.35s ease;
 }
 
-.pond {
+.ground-surface {
   position: absolute;
-  right: 24px;
-  bottom: 10px;
-  width: 200px;
-  height: 30px;
-  background: var(--pond);
-  border-top: 3px solid var(--pond-light);
-  border-radius: 4px;
+  inset: 0 0 auto;
+  height: 14px;
+  background: linear-gradient(to bottom, var(--turf-light) 0 3px, var(--turf) 3px 10px, var(--turf-dark) 10px);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -4px 0 auto;
+    height: 6px;
+    background: repeating-linear-gradient(90deg,
+      transparent 0 4px, var(--turf) 4px 6px, transparent 6px 14px,
+      var(--turf-light) 14px 18px, transparent 18px 26px, var(--turf) 26px 28px, transparent 28px 40px);
+  }
+}
+
+.pond {
+  --basin-shape: polygon(0 0, 100% 0, 100% 62%, 96% 62%, 96% 78%, 89% 78%, 89% 91%, 78% 91%, 78% 100%, 22% 100%, 22% 91%, 11% 91%, 11% 78%, 4% 78%, 4% 62%, 0 62%);
+  position: absolute;
+  right: var(--pond-right);
+  top: calc(100% - var(--ground-depth));
+  width: var(--pond-width);
+  height: 92px;
+  pointer-events: none;
+}
+
+.pond-bed {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  clip-path: var(--basin-shape);
+  background: var(--pond-bed);
+  border: 4px solid var(--soil-dark);
+  border-top: 0;
+  box-shadow: inset 0 -12px rgba(18, 30, 24, 0.2);
   transition: background-color 0.35s ease;
+}
+
+.pond-plants {
+  position: absolute;
+  inset: 0 4px;
+  z-index: 2;
+  width: calc(100% - 8px);
+  height: 100%;
+  clip-path: var(--basin-shape);
+  shape-rendering: crispEdges;
+
+  .pond-stones { fill: #A69D7C; }
+  .pond-stems { fill: #3B6A42; }
+  .pond-leaves { fill: #72985B; }
+}
+
+.pond-water {
+  position: absolute;
+  inset: 8px 4px 3px;
+  z-index: 4;
+  clip-path: var(--basin-shape);
+  background: var(--pond-water);
+  border-top: 2px solid var(--pond-light);
+  box-shadow: inset 0 8px rgba(185, 224, 225, 0.1), inset 0 -16px rgba(25, 62, 78, 0.12);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 12%;
+    width: 25%;
+    height: 2px;
+    background: var(--pond-light);
+    opacity: 0.5;
+    box-shadow: 46px 3px var(--pond-light);
+  }
 }
 
 .hen {
@@ -774,56 +949,47 @@ footer {
 .dk-dark .dk-shade { fill: #33322F; }
 .dk-dark .dk-eye { fill: #EFE6C0; }
 
-// the hens mill about near each other...
+// Positions and decisions come from farmyard.js; CSS only animates gestures.
 .hen-flock {
-  bottom: 6px;
-  animation: hen-drift var(--hd, 46s) ease-in-out infinite alternate;
-  animation-delay: var(--hdl, 0s);
-  will-change: transform;
+  z-index: 3;
+  bottom: calc(var(--ground-depth) - 2px);
+  width: 32px;
+  height: 32px;
+  line-height: 0;
 
   .hen-up,
   .hen-down {
     position: absolute;
     left: 0;
     bottom: 0;
+    transform: scaleX(var(--face, 1));
   }
 
-  .hen-down {
-    opacity: 0;
-  }
+  .hen-down { display: none; }
 
-  .hen-up svg,
-  .hen-down svg {
-    animation: peck var(--pd, 5.2s) steps(1, end) infinite;
-    animation-delay: var(--pdl, 0s);
-  }
+  &[data-state="sleeping"] { visibility: hidden; }
+  &[data-state="pecking"] .hen-up { display: none; }
+  &[data-state="pecking"] .hen-down { display: block; }
+  &[data-state="pecking"] .hen-down svg { animation: hen-peck 0.55s steps(2, end) infinite; }
+
+  &[data-state="walking"] .hen-up svg,
+  &[data-state="leaving"] .hen-up svg,
+  &[data-state="returning"] .hen-up svg { animation: bird-step 0.4s steps(2, end) infinite; }
 }
 
-.hf1 {
-  left: 12%; --hd: 44s; --hdl: -6s;  --coop-x: -90px;  --cd: 0.4s;
-  --pd: 5.3s; --pdl: -1.1s;
-}
+.hf1 { left: 17%; }
+.hf2 { left: 26%; }
+.hf3 { left: 35%; }
 
-.hf2 {
-  left: 24%; --hd: 52s; --hdl: -21s; --coop-x: -190px; --cd: 1.2s;
-  --pd: 6.4s; --pdl: -2.9s;
-
-  .hen-up, .hen-down { transform: scaleX(-1); }
-  .hen-up svg, .hen-down svg { animation-name: peck-b; }
-}
-
-.hf3 {
-  left: 36%; --hd: 48s; --hdl: -33s; --coop-x: -290px; --cd: 2s;
-  --pd: 4.3s; --pdl: -3.7s;
-
-  .hen-up svg, .hen-down svg { animation-name: peck-c; }
-}
+.scene[data-ready] .hen-flock,
+.scene[data-ready] .runner { left: 0; }
 
 // ...and at dusk they file into the coop
 .coop {
   position: absolute;
-  left: 1%;
-  bottom: 6px;
+  z-index: 2;
+  left: 3%;
+  bottom: calc(var(--ground-depth) - 6px);
   line-height: 0;
 
   .px-coop {
@@ -841,30 +1007,19 @@ footer {
   }
 }
 
-[data-theme="night"] .hen-flock {
-  animation: hen-to-coop 3.2s ease-in var(--cd, 0s) forwards;
-  pointer-events: none;
-}
+[data-theme="night"] .scene:not([data-ready]) .hen-flock { visibility: hidden; }
 
-// morning release: they stroll back out of the coop
-[data-theme="day"] .hen-flock {
-  animation:
-    hen-from-coop 2.8s ease-in-out var(--cd, 0s) backwards,
-    hen-drift var(--hd, 46s) ease-in-out var(--hdl, 0s) infinite alternate;
-}
-
-// indian runner ducks: they march in a line, waddling in step.
-// one of them (rd3) breaks ranks at the halt and leaps into the pond.
 .runner {
   position: absolute;
-  bottom: 6px;
+  z-index: 3;
+  bottom: var(--ground-depth);
   width: 40px;
   height: 48px;
 }
 
-.rd1 { left: 52%; --w: 0.55s; --fdl: -0.2s; }
-.rd2 { left: 57%; --w: 0.62s; --fdl: 10.2s; }
-.rd3 { left: 62%; --w: 0.5s; --jump-x: 240px; }
+.rd1 { left: 42%; }
+.rd2 { left: 48%; }
+.rd3 { left: 54%; }
 
 .runner .rd-move,
 .runner .rd-face {
@@ -872,105 +1027,61 @@ footer {
   inset: 0;
 }
 
-.runner .rd-move {
-  animation: runner-convoy 24s ease-in-out infinite;
-  will-change: transform;
-}
-
-.rd3 .rd-move {
-  animation-name: rd3-convoy;
-}
-
-.runner .rd-face {
-  animation: rd-turn 24s steps(1, end) infinite;
-}
-
-.rd3 .rd-face {
-  animation-name: rd3-face;
-}
+.runner .rd-face { transform: scaleX(var(--face, 1)); }
 
 .runner .rd-up,
-.runner .rd-down {
+.runner .rd-down,
+.runner .rd-nibble,
+.runner .rd-swim {
   position: absolute;
-  left: 0;
   bottom: 0;
   line-height: 0;
 }
 
-.runner .rd-down {
-  opacity: 0;
-}
+.runner .rd-up { left: 7px; }
+.runner .rd-down { left: 0; display: none; }
+.runner .rd-nibble { left: 2px; display: none; }
+.runner .rd-swim { left: 5px; display: none; transform: rotate(var(--dive-angle, 0deg)); }
+.runner .rd-up svg { width: 26px; height: 39px; transform-origin: bottom center; }
+.runner .rd-down svg { width: 39px; height: 17px; }
+.runner .rd-nibble svg { width: 35px; height: 39px; }
+.runner .rd-swim svg { width: 30px; height: 30px; }
 
-.runner .rd-up svg {
-  width: 26px;
-  height: 39px;
-  animation: runner-waddle var(--w, 0.55s) steps(2, end) infinite alternate;
-  transform-origin: bottom center;
-}
+.runner[data-state="walking"] .rd-up svg { animation: runner-waddle 0.5s steps(2, end) infinite alternate; }
+.runner[data-state="fallen"] .rd-up,
+.runner[data-state="nibbling"] .rd-up,
+.runner[data-state="swimming"] .rd-up,
+.runner[data-state="diving"] .rd-up { display: none; }
+.runner[data-state="fallen"] .rd-down,
+.runner[data-state="nibbling"] .rd-nibble,
+.runner[data-state="swimming"] .rd-swim,
+.runner[data-state="diving"] .rd-swim { display: block; }
+.runner[data-state="nibbling"] .rd-nibble svg { animation: hen-peck 0.65s steps(2, end) infinite; }
 
-.runner .rd-down svg {
-  width: 39px;
-  height: 17px;
-}
-
-// rd1 & rd2 occasionally face-plant during the halt.
-// rd3 is excused: she has a swimming appointment.
-.runner .rd-up {
-  animation: duck-up 24s steps(1, end) infinite;
-  animation-delay: var(--fdl, 0s);
-}
-
-.runner .rd-down {
-  animation: duck-down 24s steps(1, end) infinite;
-  animation-delay: var(--fdl, 0s);
-}
-
-.rd3 .rd-up {
-  animation: rd3-up 24s steps(1, end) infinite;
-}
-
-.rd3 .rd-down {
-  animation: none;
-}
-
-.rd3 .rd-swim {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  line-height: 0;
-  opacity: 0;
-  animation: rd3-swim 24s steps(1, end) infinite;
-}
-
-.rd3 .rd-swim svg {
-  width: 30px;
-  height: 30px;
-  animation: bob 2.2s steps(2, end) infinite;
-}
-
-// the splash when rd3 hits the water
+// Landing and surfacing ripples stay at the waterline while a duck dives.
 .rd-splash {
   position: absolute;
-  left: var(--jump-x, 240px);
-  bottom: 34px;
-  width: 30px;
-  height: 10px;
-  margin-left: -15px;
+  left: 20px;
+  bottom: 12px;
+  width: 26px;
+  height: 8px;
+  margin-left: -13px;
   border: 2px solid var(--pond-light);
   border-radius: 50%;
   opacity: 0;
-  animation: rd3-splash 24s linear infinite;
 }
 
 // ground greenery
 .greenery {
   position: absolute;
-  inset: 0;
+  z-index: 2;
+  inset: 0 0 var(--ground-depth);
+  pointer-events: none;
 }
 
 .plant {
   position: absolute;
-  bottom: 5px;
+  bottom: -1px;
   line-height: 0;
 }
 
@@ -979,14 +1090,14 @@ footer {
   height: 16px;
 }
 
-.p1 { left: 4%; }
+.p1 { left: 1%; }
 .p2 { left: 18%; }
 .p3 { left: 33%; }
-.p4 { left: 47%; bottom: 3px; }
-.p5 { left: 60%; }
-.p6 { left: 72%; }
-.p7 { left: 88%; }
-.p8 { left: 96%; }
+.p4 { left: 39%; }
+.p5 { left: 56%; }
+.p6 { left: calc(var(--pond-left) - 40px); }
+.p7 { left: calc(var(--pond-left) - 16px); }
+.p8 { right: 1%; }
 
 @media (prefers-reduced-motion: no-preference) {
   .plant svg {
@@ -1012,7 +1123,9 @@ footer {
 
 .fireflies {
   position: absolute;
-  inset: 0;
+  z-index: 2;
+  inset: 0 0 var(--ground-depth);
+  pointer-events: none;
   display: none;
 }
 
@@ -1041,11 +1154,15 @@ footer {
 [data-theme="night"] .night-only { display: inline-flex; }
 
 .colophon {
-  max-width: 800px;
+  width: 100%;
   margin: 0 auto;
-  padding: 0.9rem 1rem 1.2rem;
-  color: var(--ink-muted);
+  padding: 0.85rem 1rem 1rem;
+  color: #D8C7AD;
+  background: var(--soil-dark);
+  text-align: center;
   font-size: 0.85rem;
+
+  a { color: #F5C58E; }
 
   p {
     margin: 0;
@@ -1106,121 +1223,19 @@ footer {
   95%, 100% { transform: translateY(0); }
 }
 
-@keyframes peck-b {
-  0%, 44% { transform: translateY(0); }
-  45%, 50% { transform: translateY(3px); }
-  51%, 57% { transform: translateY(0); }
-  58%, 62% { transform: translateY(3px); }
-  63%, 100% { transform: translateY(0); }
+@keyframes hen-peck {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 2px; }
 }
 
-@keyframes peck-c {
-  0%, 29% { transform: translateY(0); }
-  30%, 35% { transform: translateY(3px); }
-  36%, 58% { transform: translateY(0); }
-  59%, 63% { transform: translateY(3px); }
-  64%, 68% { transform: translateY(0); }
-  69%, 72% { transform: translateY(3px); }
-  73%, 100% { transform: translateY(0); }
+@keyframes bird-step {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -1px; }
 }
 
 @keyframes runner-waddle {
   from { transform: rotate(-4deg); }
   to { transform: rotate(4deg); }
-}
-
-// the flock's day: march out, halt (somebody falls over), march home, halt again
-@keyframes runner-convoy {
-  0% { transform: translateX(0); }
-  30% { transform: translateX(84px); }
-  42% { transform: translateX(84px); }
-  68% { transform: translateX(0); }
-  80% { transform: translateX(0); }
-  100% { transform: translateX(0); }
-}
-
-@keyframes rd-turn {
-  0%, 45% { transform: scaleX(1); }
-  46%, 95% { transform: scaleX(-1); }
-  96%, 100% { transform: scaleX(1); }
-}
-
-// two stumbles per circuit: one at each halt
-@keyframes duck-up {
-  0%, 30% { opacity: 1; }
-  31%, 40% { opacity: 0; }
-  41%, 72% { opacity: 1; }
-  73%, 82% { opacity: 0; }
-  83%, 100% { opacity: 1; }
-}
-
-@keyframes duck-down {
-  0%, 30% { opacity: 0; }
-  31%, 40% { opacity: 1; }
-  41%, 72% { opacity: 0; }
-  73%, 82% { opacity: 1; }
-  83%, 100% { opacity: 0; }
-}
-
-// rd3's day: march out with the line, slip away for a swim, catch up on the
-// way home. half-submerged waypoints (-22ish) so she sits IN the water.
-@keyframes rd3-convoy {
-  0% { transform: translate(0, 0); }
-  26% { transform: translate(84px, 0); }
-  28% { transform: translate(calc(var(--jump-x, 240px) - 40px), 0); }
-  30% { transform: translate(calc(var(--jump-x, 240px) - 20px), -52px); }
-  31.5% { transform: translate(var(--jump-x, 240px), -22px); }
-  51% { transform: translate(calc(var(--jump-x, 240px) + 18px), -24px); }
-  57% { transform: translate(calc(var(--jump-x, 240px) - 20px), -25px); }
-  63% { transform: translate(calc(var(--jump-x, 240px) + 12px), -23px); }
-  68% { transform: translate(calc(var(--jump-x, 240px) - 14px), -24px); }
-  72% { transform: translate(calc(var(--jump-x, 240px) - 34px), -22px); }
-  73% { transform: translate(calc(var(--jump-x, 240px) - 58px), -10px); }
-  74% { transform: translate(calc(var(--jump-x, 240px) - 90px), 0); }
-  88% { transform: translate(0, 0); }
-  100% { transform: translate(0, 0); }
-}
-
-@keyframes rd3-face {
-  0%, 48% { transform: scaleX(1); }
-  49%, 95% { transform: scaleX(-1); }
-  96%, 100% { transform: scaleX(1); }
-}
-
-@keyframes rd3-up {
-  0%, 30.5% { opacity: 1; }
-  31%, 72.5% { opacity: 0; }
-  73%, 100% { opacity: 1; }
-}
-
-@keyframes rd3-swim {
-  0%, 30.5% { opacity: 0; }
-  31%, 72.5% { opacity: 1; }
-  73%, 100% { opacity: 0; }
-}
-
-@keyframes rd3-splash {
-  0%, 30.4% { opacity: 0; transform: scale(0.3); }
-  31.5% { opacity: 0.9; transform: scale(1); }
-  34%, 100% { opacity: 0; transform: scale(1.6); }
-}
-
-@keyframes hen-drift {
-  from { transform: translateX(0); }
-  to { transform: translateX(22px); }
-}
-
-// hens commute between coop and yard, fading at the doorway
-@keyframes hen-to-coop {
-  0% { translate: 0 0; opacity: 1; }
-  70% { opacity: 1; }
-  100% { translate: var(--coop-x, -90px) 0; opacity: 0; }
-}
-
-@keyframes hen-from-coop {
-  0% { translate: var(--coop-x, -90px) 0; opacity: 0; }
-  55% { opacity: 1; }
-  100% { translate: 0 0; opacity: 1; }
 }
 
 @keyframes side-sway {
@@ -1264,20 +1279,28 @@ footer {
 
 // ---------- motion & screen preferences ----------
 @media (prefers-reduced-motion: reduce) {
+  .sky-cloud {
+    animation: none;
+    left: 0;
+  }
+
+  .cloud-1 { left: 8%; }
+  .cloud-2 { left: 72%; }
+  .cloud-3 { left: 35%; }
+  .cloud-4 { left: 86%; }
+  .cloud-5 { left: 16%; }
+
   .falling-leaves {
     display: none;
   }
 
   // freeze the farmyard: everyone stands very still
-  .hen-flock,
-  .hen-flock svg,
-  .runner .rd-move,
-  .runner .rd-face,
-  .runner .rd-up,
-  .runner .rd-down,
-  .runner .rd-up svg,
-  .rd-splash,
-  .side {
+  .scene .hen-flock[data-state] svg,
+  .scene .runner[data-state] svg,
+  .leafy.swaying,
+  .side,
+  .coop .zzz,
+  .scene .fireflies i {
     animation: none;
   }
 }
@@ -1286,18 +1309,10 @@ footer {
   .falling-leaves i:nth-child(n + 5) {
     display: none;
   }
-
-  .rd3 {
-    --jump-x: 80px;
-  }
 }
 
 // ---------- small screens ----------
 @media (max-width: 480px) {
-  .pond {
-    width: 110px;
-  }
-
   .beds {
     grid-template-columns: 1fr;
   }

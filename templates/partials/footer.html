@@ -1,6 +1,7 @@
   </main>
   <footer>
     <div class="scene">
+      <div class="ground" aria-hidden="true"><div class="ground-surface"></div></div>
       <div class="greenery" aria-hidden="true">
         <span class="plant p1">{{ <grass /> }}</span>
         <span class="plant p2">{{ <sprout /> }}</span>
@@ -12,7 +13,21 @@
         <span class="plant p8">{{ <grass /> }}</span>
       </div>
       <div class="fireflies" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <div class="pond" aria-hidden="true"></div>
+      <div class="pond" aria-hidden="true">
+        <div class="pond-bed"></div>
+        <svg class="pond-plants" viewBox="0 0 240 90" preserveAspectRatio="none" focusable="false">
+          <g class="pond-stones">
+            <path d="M34 75h18v8H34zM57 81h12v6H57zM103 79h22v8h-22zM166 77h18v8h-18zM188 72h14v7h-14z" />
+          </g>
+          <g class="pond-stems">
+            <path d="M54 80V40h3v40zM50 67H39v-4h11zM43 63h-4V52h4zM57 56h11v-4H57zM64 52h4V42h-4zM118 85V48h3v37zM110 71h8v-4h-8zM107 59h3v12h-3zM121 63h10v-4h-10zM128 50h3v13h-3zM178 80V35h3v45zM167 62h11v-4h-11zM164 46h3v16h-3zM181 51h10v-4h-10zM188 37h3v14h-3z" />
+          </g>
+          <g class="pond-leaves">
+            <path d="M47 46h8v8h-8zM62 36h8v8h-8zM101 54h8v8h-8zM125 44h8v8h-8zM158 41h8v8h-8zM186 31h8v8h-8z" />
+          </g>
+        </svg>
+        <div class="pond-water"></div>
+      </div>
       <button class="hen hen-flock hf1 hen-white" type="button" aria-label="A hen. Click her.">
         <span class="hen-up">{{ <hen /> }}</span>
         <span class="hen-down">{{ <hen_peck /> }}</span>
@@ -32,28 +47,19 @@
         {{ <coop /> }}
         <span class="zzz night-only">z z z</span>
       </span>
-      <span class="runner rd1 dk-white" aria-hidden="true">
-        <span class="rd-move"><span class="rd-face">
-          <span class="rd-up">{{ <runner_duck /> }}</span>
-          <span class="rd-down">{{ <runner_duck_tipped /> }}</span>
-        </span></span>
-      </span>
-      <span class="runner rd2 dk-fawn" aria-hidden="true">
-        <span class="rd-move"><span class="rd-face">
-          <span class="rd-up">{{ <runner_duck /> }}</span>
-          <span class="rd-down">{{ <runner_duck_tipped /> }}</span>
-        </span></span>
-      </span>
-      <span class="runner rd3 dk-dark" aria-hidden="true">
+      {% for duck in [1, 2, 3] %}
+      <span class="runner rd{{ duck }} {% if duck == 1 %}dk-white{% elif duck == 2 %}dk-fawn{% else %}dk-dark{% endif %}" aria-hidden="true">
         <span class="rd-move">
           <i class="rd-splash"></i>
           <span class="rd-face">
             <span class="rd-up">{{ <runner_duck /> }}</span>
+            <span class="rd-nibble">{{ <runner_duck_nibble /> }}</span>
             <span class="rd-swim">{{ <duck /> }}</span>
             <span class="rd-down">{{ <runner_duck_tipped /> }}</span>
           </span>
         </span>
       </span>
+      {% endfor %}
     </div>
     <div class="colophon">
       <p>&copy; {{ now() | date(format='%Y') }} {{ config.author }} &middot;
@@ -62,17 +68,11 @@
         &middot; <span id="egg-count"></span></p>
     </div>
   </footer>
+  <script type="module" src="{{ get_url(path='farmyard.js', cachebust=true) }}"></script>
   <script>
     (function () {
       var root = document.documentElement;
       var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      // theme toggle
-      document.getElementById('theme-toggle').addEventListener('click', function () {
-        var t = root.dataset.theme === 'night' ? 'day' : 'night';
-        root.dataset.theme = t;
-        localStorage.setItem('theme', t);
-      });
 
       // season picker: pick a season, or click the active one for auto
       var pickers = document.querySelectorAll('.season-picker .sp');
@@ -105,26 +105,26 @@
       var PLANT_BASE = '{{ get_url(path="images/plants/") }}';
       var POOLS = {
         spring: [
-          ['apple-leaf.png', 88, 1], ['apple-leaf.png', 88, 1], ['apple-blossom.png', 64, 1],
-          ['bean-leaf.png', 80, 1.2], ['bean-leaf.png', 80, 1.2], ['bean-flower.png', 56, 1.14],
+          ['apple-leaf.png', 88, 1], ['apple-leaf.png', 88, 1], ['apple-blossom.png', 40, 1],
+          ['bean-leaf.png', 80, 1.2], ['bean-leaf.png', 80, 1.2], ['bean-flower.png', 32, 1.14],
           ['strawberry-leaf.png', 76, 1], ['strawberry-leaf.png', 76, 1]
         ],
         summer: [
           ['apple-leaf.png', 88, 1], ['apple-leaf.png', 88, 1],
-          ['bean-leaf.png', 80, 1.2], ['bean-leaf.png', 80, 1.2], ['bean-pod.png', 60, 1.53],
-          ['strawberry-leaf.png', 76, 1], ['strawberry-flower.png', 56, 1], ['strawberry.png', 60, 1.2],
-          ['tomato-leaf.png', 88, 0.91], ['tomato-leaf.png', 88, 0.91], ['tomato-flower.png', 52, 1], ['tomato-fruit.png', 60, 1],
+          ['bean-leaf.png', 80, 1.2], ['bean-leaf.png', 80, 1.2], ['bean-pod.png', 32, 1.53],
+          ['strawberry-leaf.png', 76, 1], ['strawberry-flower.png', 32, 1], ['strawberry.png', 24, 1.2],
+          ['tomato-leaf.png', 88, 0.91], ['tomato-leaf.png', 88, 0.91], ['tomato-flower.png', 30, 1], ['tomato-fruit.png', 34, 1],
           ['kale.png', 128, 0.875], ['kale.png', 128, 0.875],
-          ['squash-leaf.png', 148, 0.865], ['squash-leaf.png', 148, 0.865], ['squash-flower.png', 76, 1.105],
-          ['pumpkin.png', 84, 0.905]
+          ['squash-leaf.png', 148, 0.865], ['squash-leaf.png', 148, 0.865], ['squash-flower.png', 50, 1.105],
+          ['pumpkin.png', 60, 0.905]
         ],
         autumn: [
-          ['apple-fruit.png', 64, 1.125], ['apple-fruit.png', 64, 1.125],
-          ['strawberry.png', 60, 1.2], ['strawberry.png', 60, 1.2],
-          ['tomato-leaf.png', 88, 0.91], ['tomato-fruit.png', 60, 1], ['tomato-leaf.png', 88, 0.91],
+          ['apple-leaf.png', 88, 1], ['apple-fruit.png', 42, 1.125],
+          ['strawberry-leaf.png', 76, 1], ['strawberry.png', 24, 1.2],
+          ['tomato-leaf.png', 88, 0.91], ['tomato-fruit.png', 34, 1], ['tomato-leaf.png', 88, 0.91],
           ['kale.png', 128, 0.875], ['kale.png', 128, 0.875],
           ['squash-leaf.png', 148, 0.865], ['squash-leaf.png', 148, 0.865],
-          ['pumpkin.png', 84, 0.905], ['pumpkin.png', 84, 0.905]
+          ['pumpkin.png', 60, 0.905], ['pumpkin.png', 60, 0.905]
         ],
         winter: [
           ['apple-branch.png', 72, 1.389], ['apple-branch.png', 72, 1.389], ['apple-branch.png', 72, 1.389]
@@ -141,40 +141,60 @@
         };
       }
 
-      // plant leaves from the edge inward, stems off-screen, no vertical gaps:
-      // spacing (85px) is smaller than the leaves' span, so they always overlap
+      // Fan overlapping shoots from roots just beyond the viewport edge.
       function plantSides() {
         var season = POOLS[root.dataset.season] ? root.dataset.season : 'summer';
         var pool = POOLS[season];
-        var spacing = 85;
-        var count = Math.ceil(window.innerHeight / spacing) + 1;
+        var winter = season === 'winter';
+        var foliage = pool.filter(function (p) { return /leaf|kale|branch/.test(p[0]); });
+        var accents = pool.filter(function (p) { return !/leaf|kale|branch/.test(p[0]); });
+        var spacing = winter ? 94 : 62;
+        var count = Math.ceil(window.innerHeight / spacing) + 2;
+        var maxReach = Math.max(56, Math.min(150, (window.innerWidth - 800) / 2 - 20));
         ['l', 'r'].forEach(function (side, si) {
           var col = document.querySelector(side === 'l' ? '.vines-l' : '.vines-r');
           if (!col) return;
           col.innerHTML = '';
+          if (window.innerWidth < 1000) return;
           var rnd = mulberry((SEED_OF[season] || 22) * 100 + si * 7 + count);
-          for (var i = 0; i < count; i++) {
-            var pick = pool[Math.floor(rnd() * pool.length)];
-            var w = pick[1], ratio = pick[2];
-            var sc = 0.75 + rnd() * 0.55; // 0.75x - 1.3x
-            var dispH = w * ratio * sc;
-            var y = i * spacing + (rnd() * 44 - 22) + 42;
+          var vine = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          vine.setAttribute('class', 'side-vine');
+          vine.setAttribute('viewBox', '0 0 18 ' + window.innerHeight);
+          vine.setAttribute('preserveAspectRatio', 'none');
+          vine.setAttribute('focusable', 'false');
+          var stem = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          var path = 'M8 -30';
+          for (var sy = 0; sy < window.innerHeight + 100; sy += 100) {
+            path += ' Q' + (sy % 200 ? 19 : -3) + ' ' + (sy + 30) + ' 8 ' + (sy + 100);
+          }
+          stem.setAttribute('d', path);
+          vine.appendChild(stem);
+          col.appendChild(vine);
+          function shoot(pick, y, tilt, size, accent) {
+            var w = Math.round(Math.min(pick[1] * size, maxReach / pick[2]));
             var img = document.createElement('img');
-            img.className = 'leafy' + (!reduceMotion ? ' swaying' : '');
+            img.className = 'leafy' + (accent ? ' plant-accent' : '') + (!reduceMotion ? ' swaying' : '');
             img.src = PLANT_BASE + '/' + pick[0];
-            img.width = Math.round(w);
+            img.width = w;
             img.alt = '';
-            img.style.top = Math.round(y - dispH / 2) + 'px';
-            img.style[side === 'l' ? 'left' : 'right'] = Math.round(14 - w / 2) + 'px';
-            // mirror AFTER the rotate (left-to-right composition): mirroring a
-            // rotated leaf flips its facing — mirroring before it does not,
-            // which used to leave half the leaves pointing off-screen
-            img.style.transform = 'rotate(' + ((side === 'l' ? 90 : -90) + (rnd() * 30 - 15)).toFixed(1) + 'deg) scaleX(' + (rnd() < 0.45 ? -1 : 1) + ') scale(' + sc.toFixed(2) + ')';
+            img.style.top = Math.round(y - w * pick[2]) + 'px';
+            img.style[side === 'l' ? 'left' : 'right'] = (-8 - w / 2) + 'px';
+            img.style.transform = 'rotate(' + ((side === 'l' ? 90 : -90) + tilt).toFixed(1) + 'deg) scaleX(' + (rnd() < 0.5 ? -1 : 1) + ')';
             if (!reduceMotion) {
-              img.style.animationDuration = (5 + rnd() * 3).toFixed(2) + 's';
-              img.style.animationDelay = (-rnd() * 6).toFixed(2) + 's';
+              img.style.animationDuration = (7 + rnd() * 4).toFixed(2) + 's';
+              img.style.animationDelay = (-rnd() * 8).toFixed(2) + 's';
             }
             col.appendChild(img);
+          }
+          for (var i = 0; i < count; i++) {
+            var y = i * spacing + rnd() * 20 - 15;
+            shoot(foliage[Math.floor(rnd() * foliage.length)], y, -24 + rnd() * 14, 0.95 + rnd() * 0.25, false);
+            if (!winter) {
+              shoot(foliage[Math.floor(rnd() * foliage.length)], y + 20, 18 + rnd() * 22, 0.65 + rnd() * 0.25, false);
+              if (accents.length && rnd() < 0.45) {
+                shoot(accents[Math.floor(rnd() * accents.length)], y + 12, rnd() * 36 - 18, 0.9 + rnd() * 0.15, true);
+              }
+            }
           }
         });
       }

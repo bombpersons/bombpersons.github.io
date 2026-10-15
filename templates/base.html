@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ config.title }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ config.description }}{% endblock %}">
+  <link rel="stylesheet" href="{{ get_url(path='site.css', cachebust=true) }}">
+  <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path=config.feed_filenames | first) }}">
+</head>
+<body>
+  <nav>
+    <a class="site-title" href="{{ config.base_url }}">{{ config.title }}</a>
+    <div class="nav-links">
+      <a href="{{ get_url(path='@/blog/_index.md') }}">blog</a>
+      <a href="{{ get_url(path=config.extra.old_site_url) }}">old site</a>
+      <a href="{{ get_url(path=config.feed_filenames | first) }}">feed</a>
+    </div>
+  </nav>
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    <p>&copy; {{ now() | date(format='%Y') }} {{ config.extra.author }} &middot;
+      <a href="{{ config.extra.github_url }}">github</a></p>
+  </footer>
+</body>
+</html>

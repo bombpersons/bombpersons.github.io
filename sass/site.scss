@@ -1,0 +1,134 @@
+// Palette carried over from the old site
+$bg: #17211E;
+$fg: #F3F3F3;
+$muted: #9AAFA8;
+$accent: #F5853F;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: $bg;
+  color: $fg;
+  font-family: ui-monospace, "Cascadia Mono", "Source Code Pro", Menlo, Consolas, monospace;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 0;
+
+  .site-title {
+    color: $accent;
+    font-weight: bold;
+    text-decoration: none;
+  }
+
+  .nav-links a {
+    margin-left: 1rem;
+  }
+}
+
+.content {
+  flex: 1;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+}
+
+h1, h2, h3, h4 {
+  color: $accent;
+  line-height: 1.25;
+}
+
+a {
+  color: $accent;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+iframe {
+  max-width: 100%;
+  border: 0;
+}
+
+pre {
+  overflow-x: auto;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+code {
+  background-color: rgba(255, 255, 255, 0.07);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+blockquote {
+  border-left: 3px solid $accent;
+  margin-left: 0;
+  padding-left: 1rem;
+  color: $muted;
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+
+  li {
+    margin-bottom: 1.25rem;
+  }
+}
+
+.post-date {
+  color: $muted;
+  margin-right: 0.5rem;
+}
+
+.post-summary {
+  color: $muted;
+  margin: 0.25rem 0 0;
+}
+
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px dotted rgba(255, 255, 255, 0.25);
+}
+
+footer {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+  color: $muted;
+  font-size: 0.85rem;
+
+  p {
+    margin: 0;
+  }
+}

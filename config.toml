@@ -1,0 +1,27 @@
+# The URL the site will be built for
+base_url = "https://maisy.land"
+title = "maisy.land"
+description = "Maisy's corner of the internet: a blog and assorted projects."
+default_language = "en"
+
+# Whether to automatically compile all Sass files in the sass directory
+compile_sass = true
+
+# Minify the generated HTML
+minify_html = true
+
+# Generate Atom feeds at the site root
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+
+[markdown]
+# Smart punctuation converts quotes/dashes to typographic ones
+smart_punctuation = true
+
+[markdown.highlighting]
+theme = "everforest-dark"
+
+[extra]
+author = "Maisy"
+github_url = "https://github.com/bombpersons"
+old_site_url = "/old/"

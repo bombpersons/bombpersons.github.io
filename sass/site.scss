@@ -87,7 +87,8 @@ img {
 }
 
 // ---------- pixel sprites ----------
-svg.px {
+// :where() keeps the default size at zero specificity so size classes win
+:where(svg.px) {
   width: 24px;
   height: 24px;
   display: inline-block;
@@ -100,6 +101,165 @@ svg.px {
 
 .px-egg {
   width: 18px;
+}
+
+// ---------- leaves ----------
+// Leaf sprites are coloured by CSS so the season can re-tint them.
+:root {
+  --lf-main: #5E8C5A;
+  --lf-dark: #3E6B45;
+  --lf-light: #7FB069;
+  --fl-petal: #E8A0B4;
+}
+
+[data-season="spring"] {
+  --lf-main: #7FB069;
+  --lf-dark: #527A4A;
+  --lf-light: #A9CF8F;
+  --fl-petal: #E8A0B4;
+}
+
+[data-season="summer"] {
+  --lf-main: #4F8256;
+  --lf-dark: #35603E;
+  --lf-light: #74AD66;
+  --fl-petal: #F5C542;
+}
+
+[data-season="autumn"] {
+  --lf-main: #D96C2C;
+  --lf-dark: #A84E1B;
+  --lf-light: #F0A05A;
+  --fl-petal: #D96C2C;
+}
+
+[data-season="winter"] {
+  --lf-main: #8A6A4E;
+  --lf-dark: #5E4632;
+  --lf-light: #A58A6A;
+  --fl-petal: #CDD7D2;
+}
+
+.lf-main { fill: var(--lf-main); }
+.lf-dark { fill: var(--lf-dark); }
+.lf-light { fill: var(--lf-light); }
+.fl-petal { fill: var(--fl-petal); }
+.fl-core { fill: #FBE38A; }
+
+.px-leaf {
+  width: 14px;
+  height: 14px;
+}
+
+// side tunnel foliage: raster pixel art, displayed at 2x
+// (one art pixel = 2 screen px, matching the chicken/duck sprites).
+// Planted by JS to fill the window height — see plantSides() in footer.html.
+.leafy {
+  position: absolute;
+  height: auto;
+  image-rendering: pixelated;
+  display: inline-block;
+  transform-origin: center;
+}
+
+.leafy.swaying {
+  animation: side-sway var(--swd, 6s) ease-in-out infinite alternate;
+}
+
+// falling leaves
+.falling-leaves {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+
+  i {
+    position: absolute;
+    top: -28px;
+    animation: leaf-fall var(--d, 14s) linear infinite;
+    animation-delay: var(--dl, 0s);
+    will-change: transform;
+  }
+
+  span {
+    display: inline-flex;
+    line-height: 0;
+  }
+
+  svg {
+    opacity: 0.85;
+    animation: leaf-sway var(--s, 2.8s) ease-in-out infinite alternate;
+  }
+
+  i:nth-child(1) { left: 6%;  --d: 13s;   --dl: -3s; }
+  i:nth-child(2) { left: 19%; --d: 17s;   --dl: -9s; --s: 3.3s; }
+  i:nth-child(3) { left: 31%; --d: 12s;   --dl: -6s; }
+  i:nth-child(4) { left: 47%; --d: 18s;   --dl: -1s; --s: 2.4s; }
+  i:nth-child(5) { left: 63%; --d: 14s;   --dl: -11s; --s: 3s; }
+  i:nth-child(6) { left: 78%; --d: 16s;   --dl: -5s; }
+  i:nth-child(7) { left: 91%; --d: 12.5s; --dl: -8s; --s: 2.6s; }
+
+  // per-leaf variety
+  i:nth-child(2) span { transform: scaleX(-1) rotate(12deg); }
+  i:nth-child(3) span { transform: rotate(-18deg) scale(0.85); }
+  i:nth-child(4) span { transform: scale(0.7); }
+  i:nth-child(4) svg  { opacity: 0.7; }
+  i:nth-child(5) span { transform: scaleX(-1) rotate(-25deg) scale(0.9); }
+  i:nth-child(6) span { transform: rotate(30deg) scale(0.75); }
+  i:nth-child(7) span { transform: rotate(8deg); }
+}
+
+[data-theme="night"] .falling-leaves {
+  opacity: 0.75;
+}
+
+[data-season="winter"] .falling-leaves i:nth-child(n + 4) {
+  display: none;
+}
+
+// side vines framing the page
+.vines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  display: none;
+}
+
+@media (min-width: 1000px) {
+  .vines {
+    display: block;
+  }
+}
+
+// side leaves poking in from the edges — a tunnel of plants.
+// contents are planted by JS (plantSides); .vines-side columns anchor each edge
+.vines-side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 130px;
+}
+
+.vines-l { left: 0; }
+.vines-r { right: 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .side {
+    animation: side-sway 6s ease-in-out infinite alternate;
+  }
+
+  .side:nth-child(2n) { animation-duration: 7.5s; animation-delay: -2s; }
+  .side:nth-child(3n) { animation-duration: 5.2s; animation-delay: -3.5s; }
+}
+
+// keep real content above the ambient layers
+nav,
+.content,
+footer {
+  position: relative;
+  z-index: 1;
 }
 
 // ---------- nav ----------
@@ -124,6 +284,21 @@ nav {
 
     svg {
       filter: var(--glow);
+    }
+
+    .logo {
+      position: relative;
+      display: inline-flex;
+      line-height: 0;
+
+      .px-leaf {
+        position: absolute;
+        top: -6px;
+        right: -8px;
+        width: 11px;
+        height: 11px;
+        transform: rotate(45deg);
+      }
     }
   }
 
@@ -160,6 +335,46 @@ nav {
   &:hover {
     border-color: var(--accent);
   }
+}
+
+.season-picker {
+  display: inline-flex;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+
+  .sp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 5px;
+    background: transparent;
+    border: 0;
+    border-left: 1px solid var(--line);
+    cursor: pointer;
+    line-height: 0;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      background-color: var(--chip);
+    }
+  }
+
+  .sp:first-child {
+    border-left: 0;
+  }
+}
+
+[data-season="spring"] .sp-spring,
+[data-season="summer"] .sp-summer,
+[data-season="autumn"] .sp-autumn,
+[data-season="winter"] .sp-winter {
+  background-color: var(--chip);
+  box-shadow: inset 0 -3px 0 var(--accent);
 }
 
 .icon-sun,
@@ -256,6 +471,34 @@ blockquote {
     font-weight: bold;
     color: var(--ink);
   }
+}
+
+// the patch responds to the season switcher
+.patch-crop,
+.patch-name i {
+  display: none;
+}
+
+.patch-crop {
+  line-height: 0;
+}
+
+.patch-name i {
+  font-style: normal;
+}
+
+[data-season="spring"] .patch-crop[data-for="spring"],
+[data-season="summer"] .patch-crop[data-for="summer"],
+[data-season="autumn"] .patch-crop[data-for="autumn"],
+[data-season="winter"] .patch-crop[data-for="winter"] {
+  display: inline-flex;
+}
+
+[data-season="spring"] .patch-name i[data-for="spring"],
+[data-season="summer"] .patch-name i[data-for="summer"],
+[data-season="autumn"] .patch-name i[data-for="autumn"],
+[data-season="winter"] .patch-name i[data-for="winter"] {
+  display: inline;
 }
 
 // ---------- seed packets (blog cards) ----------
@@ -494,35 +737,6 @@ footer {
   transition: background-color 0.35s ease;
 }
 
-.duck {
-  position: absolute;
-  right: 130px;
-  bottom: 18px;
-
-  svg {
-    width: 32px;
-    height: 32px;
-    animation: bob 3s steps(2, end) infinite;
-  }
-}
-
-.ripple {
-  position: absolute;
-  left: 50%;
-  bottom: -8px;
-  width: 34px;
-  height: 10px;
-  margin-left: -17px;
-  border: 2px solid var(--pond-light);
-  border-radius: 50%;
-  opacity: 0;
-  animation: ripple 3.2s ease-out infinite;
-}
-
-.ripple.r2 {
-  animation-delay: 1.6s;
-}
-
 .hen {
   position: absolute;
   background: none;
@@ -537,10 +751,35 @@ footer {
   }
 }
 
-.hen-walk {
-  left: 12%;
+// bird colourings
+.hn-body { fill: #FBF7EC; }
+.hn-shade { fill: #E4D9C4; }
+.hn-eye { fill: #2B2B2B; }
+
+.hen-buff .hn-body { fill: #D8A96C; }
+.hen-buff .hn-shade { fill: #B5854E; }
+
+.hen-black .hn-body { fill: #46413C; }
+.hen-black .hn-shade { fill: #2E2B28; }
+.hen-black .hn-eye { fill: #EFE6C0; }
+
+.dk-body { fill: #FBF7EC; }
+.dk-shade { fill: #E4D9C4; }
+.dk-eye { fill: #2B2B2B; }
+
+.dk-fawn .dk-body { fill: #D8A96C; }
+.dk-fawn .dk-shade { fill: #B5854E; }
+
+.dk-dark .dk-body { fill: #4A4A44; }
+.dk-dark .dk-shade { fill: #33322F; }
+.dk-dark .dk-eye { fill: #EFE6C0; }
+
+// the hens mill about near each other...
+.hen-flock {
   bottom: 6px;
-  animation: stroll 14s ease-in-out infinite alternate;
+  animation: hen-drift var(--hd, 46s) ease-in-out infinite alternate;
+  animation-delay: var(--hdl, 0s);
+  will-change: transform;
 
   .hen-up,
   .hen-down {
@@ -555,23 +794,208 @@ footer {
 
   .hen-up svg,
   .hen-down svg {
-    animation: peck 5s steps(1, end) infinite;
+    animation: peck var(--pd, 5.2s) steps(1, end) infinite;
+    animation-delay: var(--pdl, 0s);
   }
 }
 
-.hen-sleep {
-  left: 12%;
+.hf1 {
+  left: 12%; --hd: 44s; --hdl: -6s;  --coop-x: -90px;  --cd: 0.4s;
+  --pd: 5.3s; --pdl: -1.1s;
+}
+
+.hf2 {
+  left: 24%; --hd: 52s; --hdl: -21s; --coop-x: -190px; --cd: 1.2s;
+  --pd: 6.4s; --pdl: -2.9s;
+
+  .hen-up, .hen-down { transform: scaleX(-1); }
+  .hen-up svg, .hen-down svg { animation-name: peck-b; }
+}
+
+.hf3 {
+  left: 36%; --hd: 48s; --hdl: -33s; --coop-x: -290px; --cd: 2s;
+  --pd: 4.3s; --pdl: -3.7s;
+
+  .hen-up svg, .hen-down svg { animation-name: peck-c; }
+}
+
+// ...and at dusk they file into the coop
+.coop {
+  position: absolute;
+  left: 1%;
   bottom: 6px;
-  cursor: default;
+  line-height: 0;
+
+  .px-coop {
+    width: 84px;
+    height: 66px;
+  }
 
   .zzz {
     position: absolute;
-    top: -14px;
-    left: 20px;
+    top: -12px;
+    left: 52px;
     color: var(--ink-muted);
     font-size: 0.7rem;
     animation: float-zzz 4s ease-in-out infinite;
   }
+}
+
+[data-theme="night"] .hen-flock {
+  animation: hen-to-coop 3.2s ease-in var(--cd, 0s) forwards;
+  pointer-events: none;
+}
+
+// morning release: they stroll back out of the coop
+[data-theme="day"] .hen-flock {
+  animation:
+    hen-from-coop 2.8s ease-in-out var(--cd, 0s) backwards,
+    hen-drift var(--hd, 46s) ease-in-out var(--hdl, 0s) infinite alternate;
+}
+
+// indian runner ducks: they march in a line, waddling in step.
+// one of them (rd3) breaks ranks at the halt and leaps into the pond.
+.runner {
+  position: absolute;
+  bottom: 6px;
+  width: 40px;
+  height: 48px;
+}
+
+.rd1 { left: 52%; --w: 0.55s; --fdl: -0.2s; }
+.rd2 { left: 57%; --w: 0.62s; --fdl: 10.2s; }
+.rd3 { left: 62%; --w: 0.5s; --jump-x: 240px; }
+
+.runner .rd-move,
+.runner .rd-face {
+  position: absolute;
+  inset: 0;
+}
+
+.runner .rd-move {
+  animation: runner-convoy 24s ease-in-out infinite;
+  will-change: transform;
+}
+
+.rd3 .rd-move {
+  animation-name: rd3-convoy;
+}
+
+.runner .rd-face {
+  animation: rd-turn 24s steps(1, end) infinite;
+}
+
+.rd3 .rd-face {
+  animation-name: rd3-face;
+}
+
+.runner .rd-up,
+.runner .rd-down {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  line-height: 0;
+}
+
+.runner .rd-down {
+  opacity: 0;
+}
+
+.runner .rd-up svg {
+  width: 26px;
+  height: 39px;
+  animation: runner-waddle var(--w, 0.55s) steps(2, end) infinite alternate;
+  transform-origin: bottom center;
+}
+
+.runner .rd-down svg {
+  width: 39px;
+  height: 17px;
+}
+
+// rd1 & rd2 occasionally face-plant during the halt.
+// rd3 is excused: she has a swimming appointment.
+.runner .rd-up {
+  animation: duck-up 24s steps(1, end) infinite;
+  animation-delay: var(--fdl, 0s);
+}
+
+.runner .rd-down {
+  animation: duck-down 24s steps(1, end) infinite;
+  animation-delay: var(--fdl, 0s);
+}
+
+.rd3 .rd-up {
+  animation: rd3-up 24s steps(1, end) infinite;
+}
+
+.rd3 .rd-down {
+  animation: none;
+}
+
+.rd3 .rd-swim {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  line-height: 0;
+  opacity: 0;
+  animation: rd3-swim 24s steps(1, end) infinite;
+}
+
+.rd3 .rd-swim svg {
+  width: 30px;
+  height: 30px;
+  animation: bob 2.2s steps(2, end) infinite;
+}
+
+// the splash when rd3 hits the water
+.rd-splash {
+  position: absolute;
+  left: var(--jump-x, 240px);
+  bottom: 34px;
+  width: 30px;
+  height: 10px;
+  margin-left: -15px;
+  border: 2px solid var(--pond-light);
+  border-radius: 50%;
+  opacity: 0;
+  animation: rd3-splash 24s linear infinite;
+}
+
+// ground greenery
+.greenery {
+  position: absolute;
+  inset: 0;
+}
+
+.plant {
+  position: absolute;
+  bottom: 5px;
+  line-height: 0;
+}
+
+.plant svg {
+  width: 16px;
+  height: 16px;
+}
+
+.p1 { left: 4%; }
+.p2 { left: 18%; }
+.p3 { left: 33%; }
+.p4 { left: 47%; bottom: 3px; }
+.p5 { left: 60%; }
+.p6 { left: 72%; }
+.p7 { left: 88%; }
+.p8 { left: 96%; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .plant svg {
+    animation: grass-sway 3.8s ease-in-out infinite alternate;
+    transform-origin: bottom center;
+  }
+
+  .plant:nth-child(2n) svg { animation-duration: 4.6s; animation-delay: -1.2s; }
+  .plant:nth-child(3n) svg { animation-duration: 3.1s; animation-delay: -2s; }
 }
 
 .egg-pop {
@@ -610,14 +1034,11 @@ footer {
   i:nth-child(4) { left: 42%; bottom: 45%; animation-delay: -1.5s; animation-duration: 12s; }
 }
 
-.night-only,
-.day-only {
+.night-only {
   display: none;
 }
 
 [data-theme="night"] .night-only { display: inline-flex; }
-[data-theme="night"] .hen-walk { display: none; }
-[data-theme="day"] .day-only { display: inline-flex; }
 
 .colophon {
   max-width: 800px;
@@ -677,11 +1098,6 @@ footer {
   50% { transform: translateY(-1px); }
 }
 
-@keyframes ripple {
-  0% { transform: scale(0.5); opacity: 0.8; }
-  100% { transform: scale(1.8); opacity: 0; }
-}
-
 @keyframes peck {
   0%, 69% { transform: translateY(0); }
   70%, 79% { transform: translateY(3px); }
@@ -690,9 +1106,131 @@ footer {
   95%, 100% { transform: translateY(0); }
 }
 
-@keyframes stroll {
-  0% { margin-left: 0; }
-  100% { margin-left: 9vw; }
+@keyframes peck-b {
+  0%, 44% { transform: translateY(0); }
+  45%, 50% { transform: translateY(3px); }
+  51%, 57% { transform: translateY(0); }
+  58%, 62% { transform: translateY(3px); }
+  63%, 100% { transform: translateY(0); }
+}
+
+@keyframes peck-c {
+  0%, 29% { transform: translateY(0); }
+  30%, 35% { transform: translateY(3px); }
+  36%, 58% { transform: translateY(0); }
+  59%, 63% { transform: translateY(3px); }
+  64%, 68% { transform: translateY(0); }
+  69%, 72% { transform: translateY(3px); }
+  73%, 100% { transform: translateY(0); }
+}
+
+@keyframes runner-waddle {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(4deg); }
+}
+
+// the flock's day: march out, halt (somebody falls over), march home, halt again
+@keyframes runner-convoy {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(84px); }
+  42% { transform: translateX(84px); }
+  68% { transform: translateX(0); }
+  80% { transform: translateX(0); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes rd-turn {
+  0%, 45% { transform: scaleX(1); }
+  46%, 95% { transform: scaleX(-1); }
+  96%, 100% { transform: scaleX(1); }
+}
+
+// two stumbles per circuit: one at each halt
+@keyframes duck-up {
+  0%, 30% { opacity: 1; }
+  31%, 40% { opacity: 0; }
+  41%, 72% { opacity: 1; }
+  73%, 82% { opacity: 0; }
+  83%, 100% { opacity: 1; }
+}
+
+@keyframes duck-down {
+  0%, 30% { opacity: 0; }
+  31%, 40% { opacity: 1; }
+  41%, 72% { opacity: 0; }
+  73%, 82% { opacity: 1; }
+  83%, 100% { opacity: 0; }
+}
+
+// rd3's day: march out with the line, slip away for a swim, catch up on the
+// way home. half-submerged waypoints (-22ish) so she sits IN the water.
+@keyframes rd3-convoy {
+  0% { transform: translate(0, 0); }
+  26% { transform: translate(84px, 0); }
+  28% { transform: translate(calc(var(--jump-x, 240px) - 40px), 0); }
+  30% { transform: translate(calc(var(--jump-x, 240px) - 20px), -52px); }
+  31.5% { transform: translate(var(--jump-x, 240px), -22px); }
+  51% { transform: translate(calc(var(--jump-x, 240px) + 18px), -24px); }
+  57% { transform: translate(calc(var(--jump-x, 240px) - 20px), -25px); }
+  63% { transform: translate(calc(var(--jump-x, 240px) + 12px), -23px); }
+  68% { transform: translate(calc(var(--jump-x, 240px) - 14px), -24px); }
+  72% { transform: translate(calc(var(--jump-x, 240px) - 34px), -22px); }
+  73% { transform: translate(calc(var(--jump-x, 240px) - 58px), -10px); }
+  74% { transform: translate(calc(var(--jump-x, 240px) - 90px), 0); }
+  88% { transform: translate(0, 0); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes rd3-face {
+  0%, 48% { transform: scaleX(1); }
+  49%, 95% { transform: scaleX(-1); }
+  96%, 100% { transform: scaleX(1); }
+}
+
+@keyframes rd3-up {
+  0%, 30.5% { opacity: 1; }
+  31%, 72.5% { opacity: 0; }
+  73%, 100% { opacity: 1; }
+}
+
+@keyframes rd3-swim {
+  0%, 30.5% { opacity: 0; }
+  31%, 72.5% { opacity: 1; }
+  73%, 100% { opacity: 0; }
+}
+
+@keyframes rd3-splash {
+  0%, 30.4% { opacity: 0; transform: scale(0.3); }
+  31.5% { opacity: 0.9; transform: scale(1); }
+  34%, 100% { opacity: 0; transform: scale(1.6); }
+}
+
+@keyframes hen-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(22px); }
+}
+
+// hens commute between coop and yard, fading at the doorway
+@keyframes hen-to-coop {
+  0% { translate: 0 0; opacity: 1; }
+  70% { opacity: 1; }
+  100% { translate: var(--coop-x, -90px) 0; opacity: 0; }
+}
+
+@keyframes hen-from-coop {
+  0% { translate: var(--coop-x, -90px) 0; opacity: 0; }
+  55% { opacity: 1; }
+  100% { translate: 0 0; opacity: 1; }
+}
+
+@keyframes side-sway {
+  from { translate: 0 0; rotate: -1.5deg; }
+  to { translate: 2px 0; rotate: 1.5deg; }
+}
+
+@keyframes grass-sway {
+  from { transform: rotate(-3deg); }
+  to { transform: rotate(3deg); }
 }
 
 @keyframes float-zzz {
@@ -714,14 +1252,50 @@ footer {
   80% { opacity: 0.6; }
 }
 
+@keyframes leaf-fall {
+  from { transform: translateY(-6vh); }
+  to { transform: translateY(114vh); }
+}
+
+@keyframes leaf-sway {
+  from { transform: translateX(-11px) rotate(-12deg); }
+  to { transform: translateX(11px) rotate(14deg); }
+}
+
+// ---------- motion & screen preferences ----------
+@media (prefers-reduced-motion: reduce) {
+  .falling-leaves {
+    display: none;
+  }
+
+  // freeze the farmyard: everyone stands very still
+  .hen-flock,
+  .hen-flock svg,
+  .runner .rd-move,
+  .runner .rd-face,
+  .runner .rd-up,
+  .runner .rd-down,
+  .runner .rd-up svg,
+  .rd-splash,
+  .side {
+    animation: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .falling-leaves i:nth-child(n + 5) {
+    display: none;
+  }
+
+  .rd3 {
+    --jump-x: 80px;
+  }
+}
+
 // ---------- small screens ----------
 @media (max-width: 480px) {
   .pond {
-    width: 140px;
-  }
-
-  .duck {
-    right: 80px;
+    width: 110px;
   }
 
   .beds {

@@ -1,18 +1,59 @@
   </main>
   <footer>
-    <div class="scene" aria-hidden="true">
-      <div class="fireflies"><i></i><i></i><i></i><i></i></div>
-      <div class="pond">
-        <span class="duck">{{ <duck /> }}
-          <i class="ripple r1"></i><i class="ripple r2"></i>
-        </span>
+    <div class="scene">
+      <div class="greenery" aria-hidden="true">
+        <span class="plant p1">{{ <grass /> }}</span>
+        <span class="plant p2">{{ <sprout /> }}</span>
+        <span class="plant p3">{{ <cabbage /> }}</span>
+        <span class="plant p4">{{ <grass /> }}</span>
+        <span class="plant p5">{{ <cabbage /> }}</span>
+        <span class="plant p6">{{ <grass /> }}</span>
+        <span class="plant p7">{{ <sprout /> }}</span>
+        <span class="plant p8">{{ <grass /> }}</span>
       </div>
-      <button class="hen hen-walk" id="hen" type="button" aria-label="A hen. Click her.">
+      <div class="fireflies" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="pond" aria-hidden="true"></div>
+      <button class="hen hen-flock hf1 hen-white" type="button" aria-label="A hen. Click her.">
         <span class="hen-up">{{ <hen /> }}</span>
         <span class="hen-down">{{ <hen_peck /> }}</span>
-        <span class="egg-pop" id="egg-pop">{{ <egg /> }}</span>
+        <span class="egg-pop">{{ <egg /> }}</span>
       </button>
-      <span class="hen hen-sleep night-only">{{ <hen_roost /> }}<span class="zzz">z z z</span></span>
+      <button class="hen hen-flock hf2 hen-buff" type="button" aria-label="A hen. Click her.">
+        <span class="hen-up">{{ <hen /> }}</span>
+        <span class="hen-down">{{ <hen_peck /> }}</span>
+        <span class="egg-pop">{{ <egg /> }}</span>
+      </button>
+      <button class="hen hen-flock hf3 hen-black" type="button" aria-label="A hen. Click her.">
+        <span class="hen-up">{{ <hen /> }}</span>
+        <span class="hen-down">{{ <hen_peck /> }}</span>
+        <span class="egg-pop">{{ <egg /> }}</span>
+      </button>
+      <span class="coop" aria-hidden="true">
+        {{ <coop /> }}
+        <span class="zzz night-only">z z z</span>
+      </span>
+      <span class="runner rd1 dk-white" aria-hidden="true">
+        <span class="rd-move"><span class="rd-face">
+          <span class="rd-up">{{ <runner_duck /> }}</span>
+          <span class="rd-down">{{ <runner_duck_tipped /> }}</span>
+        </span></span>
+      </span>
+      <span class="runner rd2 dk-fawn" aria-hidden="true">
+        <span class="rd-move"><span class="rd-face">
+          <span class="rd-up">{{ <runner_duck /> }}</span>
+          <span class="rd-down">{{ <runner_duck_tipped /> }}</span>
+        </span></span>
+      </span>
+      <span class="runner rd3 dk-dark" aria-hidden="true">
+        <span class="rd-move">
+          <i class="rd-splash"></i>
+          <span class="rd-face">
+            <span class="rd-up">{{ <runner_duck /> }}</span>
+            <span class="rd-swim">{{ <duck /> }}</span>
+            <span class="rd-down">{{ <runner_duck_tipped /> }}</span>
+          </span>
+        </span>
+      </span>
     </div>
     <div class="colophon">
       <p>&copy; {{ now() | date(format='%Y') }} {{ config.author }} &middot;
@@ -24,16 +65,126 @@
   <script>
     (function () {
       var root = document.documentElement;
-      var btn = document.getElementById('theme-toggle');
-      btn.addEventListener('click', function () {
+      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // theme toggle
+      document.getElementById('theme-toggle').addEventListener('click', function () {
         var t = root.dataset.theme === 'night' ? 'day' : 'night';
         root.dataset.theme = t;
         localStorage.setItem('theme', t);
       });
 
-      // the hen lays an egg when clicked
-      var hen = document.getElementById('hen');
-      var pop = document.getElementById('egg-pop');
+      // season picker: pick a season, or click the active one for auto
+      var pickers = document.querySelectorAll('.season-picker .sp');
+      function autoSeason() {
+        var mm = (new Date()).getMonth() + 1;
+        return (mm >= 3 && mm <= 5) ? 'spring' : (mm >= 6 && mm <= 8) ? 'summer' : (mm >= 9 && mm <= 11) ? 'autumn' : 'winter';
+      }
+      function seasonBtnState() {
+        Array.prototype.forEach.call(pickers, function (b) {
+          b.setAttribute('aria-pressed', b.dataset.set === root.dataset.season ? 'true' : 'false');
+        });
+      }
+      Array.prototype.forEach.call(pickers, function (b) {
+        b.addEventListener('click', function () {
+          if (b.dataset.set === root.dataset.season) {
+            localStorage.removeItem('season');
+            root.dataset.season = autoSeason();
+          } else {
+            localStorage.setItem('season', b.dataset.set);
+            root.dataset.season = b.dataset.set;
+          }
+          seasonBtnState();
+          plantSides();
+        });
+      });
+      seasonBtnState();
+
+      // side foliage: planted edge-to-edge, density follows window height.
+      // pool entries are [file, display-width, height-ratio]
+      var PLANT_BASE = 'images/plants/';
+      var POOLS = {
+        spring: [
+          ['apple-leaf.png', 88, 1], ['apple-leaf.png', 88, 1], ['apple-blossom.png', 64, 1],
+          ['bean-leaf.png', 80, 1.2], ['bean-leaf.png', 80, 1.2], ['bean-flower.png', 56, 1.14],
+          ['strawberry-leaf.png', 76, 1], ['strawberry-leaf.png', 76, 1]
+        ],
+        summer: [
+          ['apple-leaf.png', 88, 1], ['apple-leaf.png', 88, 1],
+          ['bean-leaf.png', 80, 1.2], ['bean-leaf.png', 80, 1.2], ['bean-pod.png', 60, 1.53],
+          ['strawberry-leaf.png', 76, 1], ['strawberry-flower.png', 56, 1], ['strawberry.png', 60, 1.2],
+          ['tomato-leaf.png', 88, 0.91], ['tomato-leaf.png', 88, 0.91], ['tomato-flower.png', 52, 1], ['tomato-fruit.png', 60, 1],
+          ['kale.png', 128, 0.875], ['kale.png', 128, 0.875],
+          ['squash-leaf.png', 148, 0.865], ['squash-leaf.png', 148, 0.865], ['squash-flower.png', 76, 1.105],
+          ['pumpkin.png', 84, 0.905]
+        ],
+        autumn: [
+          ['apple-fruit.png', 64, 1.125], ['apple-fruit.png', 64, 1.125],
+          ['strawberry.png', 60, 1.2], ['strawberry.png', 60, 1.2],
+          ['tomato-leaf.png', 88, 0.91], ['tomato-fruit.png', 60, 1], ['tomato-leaf.png', 88, 0.91],
+          ['kale.png', 128, 0.875], ['kale.png', 128, 0.875],
+          ['squash-leaf.png', 148, 0.865], ['squash-leaf.png', 148, 0.865],
+          ['pumpkin.png', 84, 0.905], ['pumpkin.png', 84, 0.905]
+        ],
+        winter: [
+          ['apple-branch.png', 72, 1.389], ['apple-branch.png', 72, 1.389], ['apple-branch.png', 72, 1.389]
+        ]
+      };
+      var SEED_OF = { spring: 11, summer: 22, autumn: 33, winter: 44 };
+
+      function mulberry(seed) {
+        return function () {
+          seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+          var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      // plant leaves from the edge inward, stems off-screen, no vertical gaps:
+      // spacing (85px) is smaller than the leaves' span, so they always overlap
+      function plantSides() {
+        var season = POOLS[root.dataset.season] ? root.dataset.season : 'summer';
+        var pool = POOLS[season];
+        var spacing = 85;
+        var count = Math.ceil(window.innerHeight / spacing) + 1;
+        ['l', 'r'].forEach(function (side, si) {
+          var col = document.querySelector(side === 'l' ? '.vines-l' : '.vines-r');
+          if (!col) return;
+          col.innerHTML = '';
+          var rnd = mulberry((SEED_OF[season] || 22) * 100 + si * 7 + count);
+          for (var i = 0; i < count; i++) {
+            var pick = pool[Math.floor(rnd() * pool.length)];
+            var w = pick[1], ratio = pick[2];
+            var sc = 0.75 + rnd() * 0.55; // 0.75x - 1.3x
+            var dispH = w * ratio * sc;
+            var y = i * spacing + (rnd() * 44 - 22) + 42;
+            var img = document.createElement('img');
+            img.className = 'leafy' + (!reduceMotion ? ' swaying' : '');
+            img.src = PLANT_BASE + pick[0];
+            img.width = Math.round(w);
+            img.alt = '';
+            img.style.top = Math.round(y - dispH / 2) + 'px';
+            img.style[side === 'l' ? 'left' : 'right'] = Math.round(14 - w / 2) + 'px';
+            img.style.transform = (rnd() < 0.45 ? 'scaleX(-1) ' : '') +
+              'rotate(' + ((side === 'l' ? 90 : -90) + (rnd() * 30 - 15)).toFixed(1) + 'deg) scale(' + sc.toFixed(2) + ')';
+            if (!reduceMotion) {
+              img.style.animationDuration = (5 + rnd() * 3).toFixed(2) + 's';
+              img.style.animationDelay = (-rnd() * 6).toFixed(2) + 's';
+            }
+            col.appendChild(img);
+          }
+        });
+      }
+
+      plantSides();
+      var resizeTimer;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(plantSides, 150);
+      });
+
+      // every hen lays an egg when clicked
       var counter = document.getElementById('egg-count');
       function eggCount() { return parseInt(localStorage.getItem('eggs') || '0', 10); }
       function showCount() {
@@ -41,17 +192,16 @@
         counter.textContent = n > 0 ? 'eggs laid: ' + n : '';
       }
       showCount();
-      hen.addEventListener('click', function () {
-        if (root.dataset.theme === 'night') {
-          counter.textContent = 'shh, she\u2019s sleeping';
-          setTimeout(showCount, 2000);
-          return;
-        }
-        pop.classList.remove('popping');
-        void pop.offsetWidth;
-        pop.classList.add('popping');
-        localStorage.setItem('eggs', String(eggCount() + 1));
-        setTimeout(showCount, 1200);
+      Array.prototype.forEach.call(document.querySelectorAll('.hen-flock'), function (h) {
+        h.addEventListener('click', function () {
+          if (root.dataset.theme === 'night') return; // tucked up in the coop
+          var pop = h.querySelector('.egg-pop');
+          pop.classList.remove('popping');
+          void pop.offsetWidth;
+          pop.classList.add('popping');
+          localStorage.setItem('eggs', String(eggCount() + 1));
+          setTimeout(showCount, 1200);
+        });
       });
     })();
   </script>

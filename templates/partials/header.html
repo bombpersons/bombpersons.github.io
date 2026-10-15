@@ -1,5 +1,15 @@
+{% set m = now() | date(format='%m') %}
+{% if m == "03" or m == "04" or m == "05" %}
+  {% set season = "spring" %}
+{% elif m == "06" or m == "07" or m == "08" %}
+  {% set season = "summer" %}
+{% elif m == "09" or m == "10" or m == "11" %}
+  {% set season = "autumn" %}
+{% else %}
+  {% set season = "winter" %}
+{% endif %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-season="{{ season }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,26 +17,54 @@
   <meta name="description" content="{{ page_description | default(value=config.description) }}">
   <link rel="icon" type="image/svg+xml" href="{{ get_url(path='favicon.svg') }}">
   <script>
-    // Set theme before first paint: localStorage choice, else OS preference
+    // Apply theme + season before first paint
     (function () {
       var t = localStorage.getItem('theme');
       if (t !== 'day' && t !== 'night') {
         t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
       }
       document.documentElement.dataset.theme = t;
+
+      var sv = localStorage.getItem('season');
+      var mm = (new Date()).getMonth() + 1;
+      var auto = (mm >= 3 && mm <= 5) ? 'spring' : (mm >= 6 && mm <= 8) ? 'summer' : (mm >= 9 && mm <= 11) ? 'autumn' : 'winter';
+      var valid = ['spring', 'summer', 'autumn', 'winter'];
+      document.documentElement.dataset.season = valid.indexOf(sv) > -1 ? sv : auto;
     })();
   </script>
   <link rel="stylesheet" href="{{ get_url(path='site.css', cachebust=true) }}">
   <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path=config.feed_filenames | first) }}">
 </head>
 <body>
+  <div class="falling-leaves" aria-hidden="true">
+    <i><span>{{ <leaf /> }}</span></i>
+    <i><span>{{ <leaf variant="b" /> }}</span></i>
+    <i><span>{{ <leaf /> }}</span></i>
+    <i><span>{{ <leaf variant="b" /> }}</span></i>
+    <i><span>{{ <leaf /> }}</span></i>
+    <i><span>{{ <leaf variant="b" /> }}</span></i>
+    <i><span>{{ <leaf /> }}</span></i>
+  </div>
+  <div class="vines" aria-hidden="true">
+    <div class="vines-side vines-l"></div>
+    <div class="vines-side vines-r"></div>
+  </div>
   <nav>
-    <a class="site-title" href="{{ config.base_url }}">{{ <carrot /> }}<span>{{ config.title }}</span></a>
+    <a class="site-title" href="{{ config.base_url }}">
+      <span class="logo">{{ <carrot /> }}{{ <leaf variant="b" /> }}</span>
+      <span>{{ config.title }}</span>
+    </a>
     <div class="nav-links">
       <a href="{{ get_url(path='@/blog/_index.md') }}">blog</a>
       <a href="{{ get_url(path='@/portfolio/_index.md') }}">portfolio</a>
       <a href="{{ get_url(path=config.extra.old_site_url) }}">old site</a>
       <a href="{{ get_url(path=config.feed_filenames | first) }}">feed</a>
+      <div class="season-picker" role="group" aria-label="Season">
+        <button type="button" class="sp sp-spring" data-set="spring" aria-label="Spring" title="Spring">{{ <pea /> }}</button>
+        <button type="button" class="sp sp-summer" data-set="summer" aria-label="Summer" title="Summer">{{ <tomato /> }}</button>
+        <button type="button" class="sp sp-autumn" data-set="autumn" aria-label="Autumn" title="Autumn">{{ <pumpkin /> }}</button>
+        <button type="button" class="sp sp-winter" data-set="winter" aria-label="Winter" title="Winter">{{ <leek /> }}</button>
+      </div>
       <button id="theme-toggle" type="button" aria-label="Toggle day/night theme">
         <span class="icon-sun">{{ <sun /> }}</span>
         <span class="icon-moon">{{ <moon /> }}</span>

@@ -5,20 +5,18 @@
 </section>
 
 <div class="patch" aria-label="Currently in season">
-  {% set m = now() | date(format='%m') %}
-  {% if m == "03" or m == "04" or m == "05" %}
-    {% set crop_name = "pea" %}{% set crop_label = "Peas" %}
-  {% elif m == "06" or m == "07" or m == "08" %}
-    {% set crop_name = "tomato" %}{% set crop_label = "Tomatoes" %}
-  {% elif m == "09" or m == "10" or m == "11" %}
-    {% set crop_name = "pumpkin" %}{% set crop_label = "Pumpkins" %}
-  {% else %}
-    {% set crop_name = "leek" %}{% set crop_label = "Leeks" %}
-  {% endif %}
-  {{ <crop name={crop_name} /> }}
+  <span class="patch-crop" data-for="spring">{{ <pea /> }}</span>
+  <span class="patch-crop" data-for="summer">{{ <tomato /> }}</span>
+  <span class="patch-crop" data-for="autumn">{{ <pumpkin /> }}</span>
+  <span class="patch-crop" data-for="winter">{{ <leek /> }}</span>
   <div>
     <span class="patch-label">Now growing</span>
-    <span class="patch-name">{{ crop_label }}</span>
+    <span class="patch-name">
+      <i data-for="spring">Peas</i>
+      <i data-for="summer">Tomatoes</i>
+      <i data-for="autumn">Pumpkins</i>
+      <i data-for="winter">Leeks</i>
+    </span>
   </div>
 </div>
 

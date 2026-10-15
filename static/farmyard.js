@@ -1,4 +1,8 @@
-import { Farmyard } from './farmyard-model.js';
+const modelScript = document.querySelector('script[data-farmyard-model]');
+const modelUrl = new URL('./farmyard-model.js', import.meta.url);
+// Older cached pages may not yet carry the explicit model URL.
+modelUrl.search = new URL(import.meta.url).search;
+const { Farmyard } = await import(modelScript ? modelScript.dataset.farmyardModel : modelUrl.href);
 
 const scene = document.querySelector('.scene');
 if (scene) {
@@ -20,7 +24,9 @@ if (scene) {
       waterY: 20
     };
   }
-  const yard = new Farmyard(measure(), { night: root.dataset.theme === 'night' });
+  const yard = new Farmyard(measure(), {
+    night: root.dataset.theme === 'night', frozen: root.dataset.season === 'winter'
+  });
   yard.setReducedMotion(motion.matches);
 
   function paint() {
@@ -71,8 +77,9 @@ if (scene) {
   document.addEventListener('visibilitychange', schedule);
   new MutationObserver(() => {
     yard.setNight(root.dataset.theme === 'night');
+    yard.setFrozen(root.dataset.season === 'winter');
     paint();
-  }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+  }).observe(root, { attributes: true, attributeFilter: ['data-theme', 'data-season'] });
   new ResizeObserver(() => { yard.resize(measure()); paint(); }).observe(scene);
   motion.addEventListener('change', () => {
     yard.setReducedMotion(motion.matches);

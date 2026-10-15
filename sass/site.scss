@@ -231,9 +231,7 @@ img {
   height: 14px;
 }
 
-// side tunnel foliage: raster pixel art, displayed at 2x
-// (one art pixel = 2 screen px, matching the chicken/duck sprites).
-// Planted by JS to fill the window height — see plantSides() in footer.html.
+// Leaf and fruit sprites attach stem-first to nodes drawn by side-plants.js.
 .leafy {
   position: absolute;
   max-width: none;
@@ -243,23 +241,52 @@ img {
   transform-origin: 50% 100%;
 }
 
-.side-vine {
+.edge-plant {
   position: absolute;
-  top: 0;
-  width: 18px;
-  height: 100%;
-  fill: none;
-  stroke: var(--lf-dark);
-  stroke-width: 3px;
-  opacity: 0.8;
+  height: 0;
 }
 
-.vines-l .side-vine { left: -8px; }
-.vines-r .side-vine { right: -8px; transform: scaleX(-1); }
+.vines-l .edge-plant { left: 0; }
+.vines-r .edge-plant { right: 0; transform: scaleX(-1); }
+
+.plant-growth {
+  position: relative;
+  width: 100%;
+  height: 0;
+  transform-origin: -8px 0;
+  animation: plant-breeze var(--swd, 10s) ease-in-out infinite alternate;
+  animation-delay: var(--sway-delay, 0s);
+  --stem-main: #4B7044;
+  --stem-light: #83A165;
+}
+
+.species-apple .plant-growth {
+  --stem-main: #73543E;
+  --stem-light: #A3825A;
+}
+
+.plant-stem {
+  position: absolute;
+  top: -110px;
+  left: 0;
+  width: 100%;
+  height: 220px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--stem-main);
+  stroke-linejoin: round;
+  stroke-linecap: square;
+}
+
+.stem-highlight { stroke: var(--stem-light); opacity: 0.55; }
+.stem-node { fill: var(--stem-light); stroke: none; }
+.stem-snow { stroke: #DFEAF0; stroke-width: 3px; }
+.plant-node { position: absolute; width: 0; height: 0; }
 .plant-accent { z-index: 1; }
 
-.leafy.swaying {
-  animation: side-sway var(--swd, 6s) ease-in-out infinite alternate;
+@keyframes plant-breeze {
+  from { rotate: -0.7deg; }
+  to { rotate: 0.7deg; }
 }
 
 // falling leaves
@@ -304,14 +331,43 @@ img {
   i:nth-child(5) span { transform: scaleX(-1) rotate(-25deg) scale(0.9); }
   i:nth-child(6) span { transform: rotate(30deg) scale(0.75); }
   i:nth-child(7) span { transform: rotate(8deg); }
+
+  .winter-flake { display: none; }
 }
 
 [data-theme="night"] .falling-leaves {
   opacity: 0.75;
 }
 
-[data-season="winter"] .falling-leaves i:nth-child(n + 4) {
-  display: none;
+[data-season="winter"] .falling-leaves {
+  i {
+    display: block;
+    animation-name: snow-fall;
+    animation-duration: calc(var(--d, 14s) * 1.4);
+  }
+
+  span { display: none; }
+
+  i::before {
+    content: "";
+    display: block;
+    width: 2px;
+    height: 2px;
+    background: #F5FAFF;
+    box-shadow: 0 -2px #F5FAFF, 0 2px #F5FAFF, -2px 0 #F5FAFF, 2px 0 #F5FAFF;
+    opacity: 0.8;
+    animation: snow-sway var(--s, 4s) ease-in-out infinite alternate;
+  }
+
+  i:nth-child(2n)::before { box-shadow: none; opacity: 0.65; }
+  i:nth-child(3n)::before { width: 3px; height: 3px; opacity: 0.9; }
+  i:nth-child(8) { left: 12%; --d: 16s; --dl: -15s; --s: 4.2s; }
+  i:nth-child(9) { left: 26%; --d: 20s; --dl: -10s; --s: 3.6s; }
+  i:nth-child(10) { left: 39%; --d: 15s; --dl: -18s; --s: 5s; }
+  i:nth-child(11) { left: 56%; --d: 18s; --dl: -7s; --s: 4.5s; }
+  i:nth-child(12) { left: 70%; --d: 21s; --dl: -24s; --s: 3.8s; }
+  i:nth-child(13) { left: 84%; --d: 17s; --dl: -12s; --s: 5.2s; }
+  i:nth-child(14) { left: 96%; --d: 22s; --dl: -20s; --s: 4.4s; }
 }
 
 // side vines framing the page
@@ -321,6 +377,7 @@ img {
   pointer-events: none;
   z-index: 0;
   display: none;
+  overflow: hidden;
 }
 
 @media (min-width: 1000px) {
@@ -330,7 +387,7 @@ img {
 }
 
 // side leaves poking in from the edges — a tunnel of plants.
-// contents are planted by JS (plantSides); .vines-side columns anchor each edge
+// side-plants.js grows separate stems from each edge.
 .vines-side {
   position: absolute;
   top: 0;
@@ -912,6 +969,54 @@ footer {
   }
 }
 
+.pond-ice { display: none; }
+
+[data-season="winter"] .scene {
+  --turf-light: #F5FAFD;
+  --turf: #DFEAF0;
+  --turf-dark: #B6CDD9;
+  --ice-top: #DAEDF2;
+  --ice-edge: #98BECF;
+  --pond-water: rgba(102, 150, 181, 0.48);
+
+  .greenery { visibility: hidden; }
+  .pond-plants { opacity: 0.55; }
+  .ground-surface { height: 17px; }
+  .ground-surface::before {
+    top: -3px;
+    height: 5px;
+    background: repeating-linear-gradient(90deg, var(--turf) 0 18px, var(--turf-light) 18px 44px, var(--turf) 44px 64px);
+  }
+
+  .pond-ice {
+    display: block;
+    position: absolute;
+    z-index: 5;
+    inset: 0 2px auto;
+    height: 16px;
+    border-top: 3px solid var(--turf-light);
+    border-bottom: 4px solid var(--ice-edge);
+    background: var(--ice-top);
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 2px 12% auto;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, transparent 0 20px, var(--turf-light) 20px 42px, transparent 42px 70px);
+    }
+  }
+}
+
+[data-season="winter"][data-theme="night"] .scene {
+  --turf-light: #BCD0E1;
+  --turf: #9CB5CA;
+  --turf-dark: #657F9B;
+  --ice-top: #91B2C9;
+  --ice-edge: #577C9C;
+  --pond-water: rgba(53, 95, 135, 0.55);
+}
+
 .hen {
   position: absolute;
   background: none;
@@ -1277,6 +1382,16 @@ footer {
   to { transform: translateX(11px) rotate(14deg); }
 }
 
+@keyframes snow-fall {
+  from { transform: translate(0, -6vh); }
+  to { transform: translate(18px, 114vh); }
+}
+
+@keyframes snow-sway {
+  from { translate: -8px 0; }
+  to { translate: 8px 0; }
+}
+
 // ---------- motion & screen preferences ----------
 @media (prefers-reduced-motion: reduce) {
   .sky-cloud {
@@ -1297,7 +1412,7 @@ footer {
   // freeze the farmyard: everyone stands very still
   .scene .hen-flock[data-state] svg,
   .scene .runner[data-state] svg,
-  .leafy.swaying,
+  .plant-growth,
   .side,
   .coop .zzz,
   .scene .fireflies i {
@@ -1309,6 +1424,9 @@ footer {
   .falling-leaves i:nth-child(n + 5) {
     display: none;
   }
+
+  [data-season="winter"] .falling-leaves i { display: block; }
+  [data-season="winter"] .falling-leaves i:nth-child(n + 9) { display: none; }
 }
 
 // ---------- small screens ----------

@@ -16,7 +16,7 @@ export function testFarmyard(Farmyard) {
       waterStart: pondStart + 12, waterEnd: width * 0.96 - 48, waterY: 20
     };
   }
-  const create = (width = 1280, night = false) => new Farmyard(bounds(width), { random: seeded(90210), night });
+  const create = (width = 1280, night = false, frozen = false) => new Farmyard(bounds(width), { random: seeded(90210), night, frozen });
   function run(yard, seconds, check = () => {}) {
     for (let t = 0; t < seconds; t += 0.1) { yard.step(0.1); check(yard); }
   }
@@ -122,6 +122,34 @@ export function testFarmyard(Farmyard) {
     run(yard, 40);
     assert(yard.hens.some(h => h.state !== 'idle'), 'Motion must resume when requested');
     passed.push('reduced motion, lighting changes, and resuming movement');
+  }
+  {
+    const yard = create(375, false, true);
+    run(yard, 300, () => {
+      assert(yard.flock.mode === 'roaming', 'A frozen pond must not attract the flock');
+      assert(yard.ducks.every(d => !d.inWater && !d.jump && d.y === 0), 'Winter ducks must stay on land');
+    });
+    yard.setFrozen(false);
+    let visited = false;
+    run(yard, 200, () => { if (yard.flock.mode === 'swimming') visited = true; });
+    assert(visited, 'Ducks must resume pond visits after thawing');
+    passed.push('winter land behaviour and thawing');
+  }
+
+  for (const mode of ['approaching', 'entering', 'swimming', 'leaving']) {
+    const yard = create();
+    let elapsed = 0;
+    while (yard.flock.mode !== mode && elapsed < 180) { yard.step(0.1); elapsed += 0.1; }
+    assert(yard.flock.mode === mode, 'Did not reach ' + mode + ' before winter');
+    const positions = yard.ducks.map(d => [d.x, d.y]);
+    yard.setFrozen(true);
+    assert(yard.ducks.every((d, i) => d.x === positions[i][0] && d.y === positions[i][1]), 'Season changes must not teleport ducks');
+    run(yard, 20);
+    assert(yard.flock.mode === 'roaming' && yard.ducks.every(d => !d.inWater && !d.jump && d.y === 0), 'Winter must bring the whole flock back to shore');
+    run(yard, 90, () => {
+      assert(yard.ducks.every(d => !d.inWater && !d.jump), 'Winter ducks re-entered the frozen pond');
+    });
+    passed.push('freezing the pond during ' + mode);
   }
   return passed;
 }

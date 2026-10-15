@@ -1,9 +1,10 @@
 // Behaviour and geometry are independent of the DOM so they can be simulated.
 export class Farmyard {
-  constructor(bounds, { random = Math.random, night = false } = {}) {
+  constructor(bounds, { random = Math.random, night = false, frozen = false } = {}) {
     this.random = random;
     this.bounds = bounds;
     this.night = night;
+    this.frozen = frozen;
     this.reducedMotion = false;
     this.hens = Array.from({ length: 3 }, (_, i) => ({
       x: bounds.door, y: 0, face: 1, state: night ? 'sleeping' : 'leaving',
@@ -48,6 +49,23 @@ export class Farmyard {
   setReducedMotion(reduced) {
     this.reducedMotion = reduced;
     if (reduced) this.settle();
+  }
+
+  setFrozen(frozen) {
+    if (frozen === this.frozen) return;
+    this.frozen = frozen;
+    if (!frozen) return;
+    if (this.reducedMotion) { this.settle(); return; }
+    // Finish getting to shore if winter is selected during a pond visit.
+    const visiting = this.ducks.some(duck => duck.inWater || duck.jump);
+    this.flock.mode = visiting ? 'leaving' : 'roaming';
+    this.flock.anchor = Math.max(...this.ducks.map(duck => Math.min(duck.x, this.bounds.landEnd)));
+    this.flock.target = this.flockPoint();
+    this.flock.timer = this.between(6, 12);
+    this.ducks.forEach((duck, i) => {
+      if (duck.inWater || duck.jump) this.startJump(duck, i, false);
+      else if (duck.state === 'waiting') duck.state = 'idle';
+    });
   }
 
   settle() {
@@ -180,7 +198,7 @@ export class Farmyard {
     duck.jump = {
       elapsed: 0, duration: this.between(0.8, 1.05), from: duck.x,
       to: entering ? this.waterSlot(index) : this.bounds.landEnd - index * this.spacing(),
-      fromY: entering ? 0 : this.bounds.waterY, toY: entering ? this.bounds.waterY : 0
+      fromY: duck.y, toY: entering ? this.bounds.waterY : 0
     };
     duck.face = duck.jump.to > duck.x ? 1 : -1;
   }
@@ -192,6 +210,8 @@ export class Farmyard {
     duck.x = jump.from + (jump.to - jump.from) * t;
     duck.y = jump.fromY + (jump.toY - jump.fromY) * t - Math.sin(t * Math.PI) * 40;
     if (t === 1) {
+      duck.x = jump.to;
+      duck.y = jump.toY;
       duck.inWater = duck.state === 'jumping-in';
       duck.state = duck.inWater ? 'swimming' : 'idle';
       duck.timer = this.between(1.5, 4);
@@ -216,7 +236,7 @@ export class Farmyard {
       duck.y = this.bounds.waterY + Math.sin(duck.phase * 2.2) * 1.2;
       this.move(duck, duck.target, 13, dt);
       if (duck.timer <= 0 && this.flock.mode !== 'leaving') {
-        if (this.random() < 0.4) {
+        if (!this.frozen && this.random() < 0.4) {
           duck.state = 'diving'; duck.diveTime = 0;
           duck.diveDuration = this.between(2.5, 4);
           duck.diveDepth = this.between(22, 36);
@@ -236,7 +256,7 @@ export class Farmyard {
 
     if (flock.mode === 'roaming') {
       if (flock.timer <= 0) {
-        if (this.random() < 0.4) {
+        if (!this.frozen && this.random() < 0.4) {
           flock.mode = 'approaching';
         } else {
           flock.target = this.flockPoint();

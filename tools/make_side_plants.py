@@ -213,6 +213,9 @@ def apple_branch():
     rect(im, 31, 40, 2, 2, BROWN)
     rect(im, 25, 30, 2, 2, BROWN)
     outline(im, (40, 28, 20))
+    # the attachment end (thick stem) is drawn at the top; flip it down so it
+    # matches every other sprite (stem toward the edge after rotation)
+    im = im.transpose(Image.FLIP_TOP_BOTTOM)
     return im
 
 

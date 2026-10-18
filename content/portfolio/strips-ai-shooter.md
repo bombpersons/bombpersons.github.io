@@ -1,13 +1,14 @@
 +++
 title = "2D Shooter with STRIPS Planning AI"
 description = "A top down arena shooter with GOAP-style AI that ducks for cover, rearms and hunts you down."
-weight = 7
+weight = 13
 template = "project.html"
 
 [extra]
 group = "university"
 stage = "harvested"
 crop = "pea"
+ai = "pre-ai"
 tech = ["C++", "SFML"]
 youtube = "KUACU25uvIA"
 

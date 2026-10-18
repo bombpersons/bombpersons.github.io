@@ -1,13 +1,14 @@
 +++
 title = "Stellar Swing"
 description = "Play as a mining drone with a laser grapple and swing your way to the end of the level."
-weight = 9
+weight = 22
 template = "project.html"
 
 [extra]
 group = "pillowdrift"
 stage = "harvested"
 crop = "tomato"
+ai = "pre-ai"
 tech = ["C#", "Unity3D"]
 youtube = "8TPKQu8jN64"
 

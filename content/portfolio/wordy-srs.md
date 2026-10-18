@@ -1,13 +1,14 @@
 +++
 title = "WordySRS"
 description = "Turns the foreign language media you read into SRS vocabulary cards, automatically."
-weight = 2
+weight = 7
 template = "project.html"
 
 [extra]
 group = "personal"
 stage = "fruiting"
 crop = "tomato"
+ai = "pre-ai"
 tech = ["Rust", "HTML", "CSS", "JavaScript", "Docker"]
 
 [[extra.links]]

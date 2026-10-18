@@ -1,13 +1,14 @@
 +++
 title = "Noroi"
 description = "A modern library for creating ASCII based text games similar to Dwarf Fortress or Rogue."
-weight = 3
+weight = 8
 template = "project.html"
 
 [extra]
 group = "personal"
 stage = "fruiting"
 crop = "pumpkin"
+ai = "pre-ai"
 tech = ["C", "C++", "Haskell"]
 
 [[extra.links]]

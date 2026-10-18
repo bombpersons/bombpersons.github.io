@@ -1,13 +1,14 @@
 +++
 title = "Rocket Dodger"
 description = "A mobile game about avoiding heat seeking rockets by doing risky, cool things."
-weight = 10
+weight = 23
 template = "project.html"
 
 [extra]
 group = "pillowdrift"
 stage = "harvested"
 crop = "pea"
+ai = "pre-ai"
 tech = ["C#", "Unity3D"]
 
 [[extra.links]]

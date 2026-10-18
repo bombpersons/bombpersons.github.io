@@ -1,13 +1,14 @@
 +++
 title = "Egg RPG"
 description = "A simple 2d tile based RPG game with gameboy inspired visuals."
-weight = 1
+weight = 6
 template = "project.html"
 
 [extra]
 group = "personal"
 stage = "growing"
 crop = "egg"
+ai = "pre-ai"
 tech = ["Rust"]
 
 [[extra.links]]

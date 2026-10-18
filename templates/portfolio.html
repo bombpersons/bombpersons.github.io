@@ -14,10 +14,12 @@
       {% for page in group_pages %}
       {% set c = page.extra.crop | default(value="carrot") %}
       {% set st = page.extra.stage | default(value="growing") %}
+      {% set ai = page.extra.ai | default(value="") %}
       <article class="crop-tile">
         {{ <crop name={c} /> }}
         <h3><a href="{{ page.permalink }}">{{ page.title }}</a></h3>
         {{ <stage_badge stage={st} /> }}
+        {% if ai != "" %}{{ <ai_tag tag={ai} /> }}{% endif %}
         <p>{{ page.description }}</p>
         <span>
           {% for t in page.extra.tech %}<span class="chip">{{ t }}</span>{% endfor %}

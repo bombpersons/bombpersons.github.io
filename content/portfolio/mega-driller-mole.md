@@ -1,13 +1,14 @@
 +++
 title = "Mega Driller Mole"
 description = "Pillowdrift's first release: dig for gems with your drill whilst avoiding demons, mines and worms."
-weight = 8
+weight = 21
 template = "project.html"
 
 [extra]
 group = "pillowdrift"
 stage = "harvested"
 crop = "pumpkin"
+ai = "pre-ai"
 tech = ["Java", "libGDX"]
 youtube = "bYb1vm5-DYE"
 

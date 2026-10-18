@@ -1,13 +1,14 @@
 +++
 title = "Loyd's Tale"
 description = "A short 2D platformer game made in 48 hours for Ludum Dare 22."
-weight = 11
+weight = 24
 template = "project.html"
 
 [extra]
 group = "pillowdrift"
 stage = "harvested"
 crop = "carrot"
+ai = "pre-ai"
 tech = ["C#", "XNA"]
 
 [[extra.links]]

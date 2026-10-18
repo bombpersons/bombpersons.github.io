@@ -1,13 +1,14 @@
 +++
 title = "Dokuro3D"
 description = "A software renderer written from scratch using the win32 API and GDI."
-weight = 6
+weight = 12
 template = "project.html"
 
 [extra]
 group = "university"
 stage = "harvested"
 crop = "carrot"
+ai = "pre-ai"
 tech = ["C++"]
 youtube = "nUhEk0YRtM0"
 

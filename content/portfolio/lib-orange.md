@@ -1,13 +1,14 @@
 +++
 title = "libOrange"
 description = "Yet another cross platform OpenGL framework, built from scratch for game jams."
-weight = 4
+weight = 9
 template = "project.html"
 
 [extra]
 group = "personal"
 stage = "fruiting"
 crop = "orange"
+ai = "pre-ai"
 tech = ["C++"]
 
 [[extra.links]]

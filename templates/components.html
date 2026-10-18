@@ -386,6 +386,10 @@
 </span>
 {% endcomponent stage_badge %}
 
+{% component ai_tag(tag: string = "post-ai") %}
+<span class="chip chip-ai" {% if tag == "post-ai" %}title="Built with significant LLM assistance"{% else %}title="Built before LLM-assisted development"{% endif %}>{{ tag }}</span>
+{% endcomponent ai_tag %}
+
 {% component crop(name: string = "carrot") %}
 {%- if name == "tomato" -%}{{ <tomato /> }}
 {%- elif name == "pumpkin" -%}{{ <pumpkin /> }}

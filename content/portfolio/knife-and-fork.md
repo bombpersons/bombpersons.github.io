@@ -1,13 +1,14 @@
 +++
 title = "Knife and Fork"
 description = "An asymmetrical co-op game: one player is a knife, the other a fork, and the food fights back."
-weight = 5
+weight = 11
 template = "project.html"
 
 [extra]
 group = "university"
 stage = "harvested"
 crop = "leek"
+ai = "pre-ai"
 tech = ["C#", "XNA"]
 youtube = "tjmwAP_SQGw"
 

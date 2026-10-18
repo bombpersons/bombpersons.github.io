@@ -5,8 +5,10 @@
   <h1>{{ page.title }}</h1>
 
   {% if page.extra.stage %}
+  {% set ai = page.extra.ai | default(value="") %}
   <div class="project-meta">
     {{ <stage_badge stage={page.extra.stage} /> }}
+    {% if ai != "" %}{{ <ai_tag tag={ai} /> }}{% endif %}
     <span>
       {% for t in page.extra.tech %}<span class="chip">{{ t }}</span>{% endfor %}
     </span>

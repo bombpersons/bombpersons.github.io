@@ -48,7 +48,7 @@ if (banner) {
 
   const sparkles = banner.querySelector('.banner-sparkles');
   const star = 'M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5Z';
-  const anchors = [15, 50, 85];
+  const anchors = [7, 50, 93];
   const sparkleParts = document.createDocumentFragment();
   for (let i = 0; i < 13; i++) {
     const svg = document.createElementNS(svgNS, 'svg');
@@ -62,9 +62,16 @@ if (banner) {
     const size = 8 + Math.round(random() * 8);
     svg.style.width = size + 'px';
     svg.style.height = size + 'px';
-    svg.style.color = `var(--pastel-${pastels[Math.floor(random() * pastels.length)]})`;
-    svg.style.setProperty('--tw', (2.2 + random() * 3).toFixed(2) + 's');
-    svg.style.setProperty('--tw-delay', (-random() * 6).toFixed(2) + 's');
+    svg.style.color = `var(--sp-${pastels[Math.floor(random() * pastels.length)]})`;
+    svg.style.setProperty('--tw', (4 + random() * 3).toFixed(2) + 's');
+    svg.style.setProperty('--tw-delay', (-random() * 7).toFixed(2) + 's');
+    svg.style.setProperty('--spin', `${random() < 0.5 ? '-' : ''}${Math.round(160 + random() * 100)}deg`);
+    svg.addEventListener('animationiteration', () => {
+      const anchor = anchors[Math.floor(Math.random() * anchors.length)];
+      const jump = (Math.random() + Math.random()) / 2 - 0.5;
+      svg.style.left = (anchor + jump * 18).toFixed(1) + '%';
+      svg.style.top = (8 + Math.random() * 87).toFixed(1) + '%';
+    });
     sparkleParts.appendChild(svg);
   }
   sparkles.appendChild(sparkleParts);

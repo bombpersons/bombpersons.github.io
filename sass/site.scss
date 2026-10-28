@@ -433,7 +433,14 @@ footer {
   --pastel-mint: #BEE8D2;
   --pastel-sky: #BBD9F2;
   --pastel-lilac: #D9C9F1;
-  --banner-fs: min(4rem, calc((100vw - 2.5rem) / 7.7));
+  --sp-pink: #F47FB4;
+  --sp-peach: #F5A05F;
+  --sp-butter: #FFD84D;
+  --sp-mint: #4FD08F;
+  --sp-sky: #5FB2F0;
+  --sp-lilac: #B07FF0;
+  --lockup-em: 7.508;
+  --banner-fs: min(4rem, calc((100vw - 2.5rem) / var(--lockup-em)));
   position: relative;
   z-index: 1;
   display: grid;
@@ -478,8 +485,15 @@ footer {
 .banner-sparkles {
   position: relative;
   z-index: 1;
-  width: 100%;
   pointer-events: none;
+}
+
+.banner-echoes { width: 100%; }
+
+.banner-sparkles {
+  z-index: 3;
+  width: calc(var(--banner-fs) * var(--lockup-em));
+  justify-self: center;
 }
 
 .banner-echoes i {
@@ -523,7 +537,7 @@ footer {
   }
 
   .banner-sparkles svg {
-    animation: sparkle-twinkle var(--tw, 3s) ease-in-out infinite alternate;
+    animation: sparkle-life var(--tw, 5.5s) linear infinite;
     animation-delay: var(--tw-delay, 0s);
   }
 }
@@ -538,9 +552,12 @@ footer {
   to { transform: var(--echo-base) rotate(0.8deg) translateY(0.04em) scale(var(--echo-sx, 1.1), var(--echo-sy, 0.9)); }
 }
 
-@keyframes sparkle-twinkle {
-  from { opacity: 0; scale: 0.3; rotate: -20deg; }
-  to { opacity: 1; scale: 1; rotate: 20deg; }
+@keyframes sparkle-life {
+  0% { opacity: 0; scale: 0.2; rotate: 0deg; animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1); }
+  12% { opacity: 1; scale: 1; }
+  80% { opacity: 1; rotate: var(--spin, 180deg); animation-timing-function: cubic-bezier(0.7, 0, 0.8, 0.1); }
+  92% { opacity: 0; scale: 0.2; rotate: var(--spin, 180deg); }
+  100% { opacity: 0; scale: 0.2; rotate: var(--spin, 180deg); }
 }
 
 // ---------- nav ----------

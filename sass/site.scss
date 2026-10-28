@@ -417,45 +417,143 @@ footer {
   z-index: 1;
 }
 
+// ---------- banner ----------
+@font-face {
+  font-family: "Chewy";
+  src: url("fonts/chewy.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.banner {
+  --pastel-pink: #F9C6D3;
+  --pastel-peach: #FAD3B2;
+  --pastel-butter: #FBE9A9;
+  --pastel-mint: #BEE8D2;
+  --pastel-sky: #BBD9F2;
+  --pastel-lilac: #D9C9F1;
+  --banner-fs: min(4rem, calc((100vw - 2.5rem) / 7.7));
+  position: relative;
+  z-index: 1;
+  display: grid;
+  overflow-x: clip;
+  overflow-y: visible;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.4rem 1rem 0;
+  text-decoration: none;
+}
+
+.banner > * { grid-area: 1 / 1; }
+
+.banner-text {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  font-family: "Chewy", "Comic Sans MS", cursive;
+  font-size: var(--banner-fs);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  text-align: center;
+}
+
+.banner:hover .banner-text,
+.banner:focus-visible .banner-text { color: var(--accent-strong); }
+
+.banner-carrot svg {
+  display: block;
+  width: 1.05em;
+  height: 1.05em;
+  transform: var(--carrot-base, rotate(0deg));
+}
+
+.banner-echoes,
+.banner-sparkles {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  pointer-events: none;
+}
+
+.banner-echoes i {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  font-family: "Chewy", "Comic Sans MS", cursive;
+  font-size: var(--banner-fs);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  user-select: none;
+  transform: var(--echo-base, none);
+}
+
+.banner-sparkles svg {
+  position: absolute;
+  fill: currentColor;
+}
+
+[data-theme="night"] .banner-sparkles svg { filter: var(--glow); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .banner-text {
+    animation: banner-sway 6.5s ease-in-out infinite alternate;
+  }
+
+  .banner-carrot svg {
+    animation: banner-sway var(--carrot-swd, 5.5s) ease-in-out infinite alternate;
+    animation-delay: var(--carrot-swdel, 0s);
+  }
+
+  .banner-carrot:first-child svg { --carrot-swd: 5.5s; --carrot-swdel: -1.3s; }
+  .banner-carrot:last-child svg { --carrot-swd: 7.2s; --carrot-swdel: -3.8s; }
+
+  .banner-echoes i {
+    animation: echo-drift var(--echo-dur, 11s) ease-in-out infinite alternate;
+    animation-delay: var(--echo-delay, 0s);
+  }
+
+  .banner-sparkles svg {
+    animation: sparkle-twinkle var(--tw, 3s) ease-in-out infinite alternate;
+    animation-delay: var(--tw-delay, 0s);
+  }
+}
+
+@keyframes banner-sway {
+  from { rotate: -0.6deg; translate: 0 -1px; }
+  to { rotate: 0.6deg; translate: 0 2px; }
+}
+
+@keyframes echo-drift {
+  from { transform: var(--echo-base) rotate(-0.8deg) scale(1, 1); }
+  to { transform: var(--echo-base) rotate(0.8deg) translateY(0.04em) scale(var(--echo-sx, 1.1), var(--echo-sy, 0.9)); }
+}
+
+@keyframes sparkle-twinkle {
+  from { opacity: 0; scale: 0.3; rotate: -20deg; }
+  to { opacity: 1; scale: 1; rotate: 20deg; }
+}
+
 // ---------- nav ----------
 nav {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem 1.5rem;
   max-width: 800px;
   width: 100%;
   margin: 0 auto;
-  padding: 1.1rem 1rem 0;
-
-  .site-title {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--accent);
-    font-weight: bold;
-    text-decoration: none;
-
-    svg {
-      filter: var(--glow);
-    }
-
-    .logo {
-      position: relative;
-      display: inline-flex;
-      line-height: 0;
-
-      .px-leaf {
-        position: absolute;
-        top: -6px;
-        right: -8px;
-        width: 11px;
-        height: 11px;
-        transform: rotate(45deg);
-      }
-    }
-  }
+  padding: 0.4rem 1rem 0;
 
   .nav-links {
     display: flex;

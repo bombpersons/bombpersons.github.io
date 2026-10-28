@@ -28,6 +28,7 @@
   </script>
   <script src="{{ get_url(path='sky.js', cachebust=true) }}"></script>
   <link rel="stylesheet" href="{{ get_url(path='site.css', cachebust=true) }}">
+  <script type="module" src="{{ get_url(path='banner.js', cachebust=true) }}"></script>
   <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path=config.feed_filenames | first) }}">
 </head>
 <body>
@@ -56,11 +57,14 @@
     <div class="vines-side vines-l"></div>
     <div class="vines-side vines-r"></div>
   </div>
+  <a class="banner" href="{{ config.base_url }}">
+    <strong class="banner-text">
+      <span class="banner-carrot" aria-hidden="true">{{ <carrot /> }}</span>maisy.land<span class="banner-carrot" aria-hidden="true">{{ <carrot /> }}</span>
+    </strong>
+    <span class="banner-echoes" aria-hidden="true"></span>
+    <span class="banner-sparkles" aria-hidden="true"></span>
+  </a>
   <nav>
-    <a class="site-title" href="{{ config.base_url }}">
-      <span class="logo">{{ <carrot /> }}{{ <leaf variant="b" /> }}</span>
-      <span>{{ config.title }}</span>
-    </a>
     <div class="nav-links">
       <a href="{{ get_url(path='@/blog/_index.md') }}">blog</a>
       <a href="{{ get_url(path='@/portfolio/_index.md') }}">portfolio</a>

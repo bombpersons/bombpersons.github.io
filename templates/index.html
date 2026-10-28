@@ -4,22 +4,6 @@
   {{ section.content | safe }}
 </section>
 
-<div class="patch" aria-label="Currently in season">
-  <span class="patch-crop" data-for="spring">{{ <pea /> }}</span>
-  <span class="patch-crop" data-for="summer">{{ <tomato /> }}</span>
-  <span class="patch-crop" data-for="autumn">{{ <pumpkin /> }}</span>
-  <span class="patch-crop" data-for="winter">{{ <leek /> }}</span>
-  <div>
-    <span class="patch-label">Now growing</span>
-    <span class="patch-name">
-      <i data-for="spring">Peas</i>
-      <i data-for="summer">Tomatoes</i>
-      <i data-for="autumn">Pumpkins</i>
-      <i data-for="winter">Leeks</i>
-    </span>
-  </div>
-</div>
-
 {{ <veg_divider /> }}
 
 {% set blog = get_section(path="blog/_index.md") %}

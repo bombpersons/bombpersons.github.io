@@ -719,65 +719,6 @@ blockquote {
   }
 }
 
-// ---------- the patch (now growing) ----------
-.patch {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  border: 3px solid var(--wood);
-  background: var(--card);
-  padding: 0.9rem 1.1rem;
-  margin: 1.5rem 0;
-  max-width: 420px;
-
-  .px {
-    width: 48px;
-    height: 48px;
-    filter: var(--glow);
-  }
-
-  .patch-label {
-    display: block;
-    color: var(--ink-muted);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .patch-name {
-    font-weight: bold;
-    color: var(--ink);
-  }
-}
-
-// the patch responds to the season switcher
-.patch-crop,
-.patch-name i {
-  display: none;
-}
-
-.patch-crop {
-  line-height: 0;
-}
-
-.patch-name i {
-  font-style: normal;
-}
-
-[data-season="spring"] .patch-crop[data-for="spring"],
-[data-season="summer"] .patch-crop[data-for="summer"],
-[data-season="autumn"] .patch-crop[data-for="autumn"],
-[data-season="winter"] .patch-crop[data-for="winter"] {
-  display: inline-flex;
-}
-
-[data-season="spring"] .patch-name i[data-for="spring"],
-[data-season="summer"] .patch-name i[data-for="summer"],
-[data-season="autumn"] .patch-name i[data-for="autumn"],
-[data-season="winter"] .patch-name i[data-for="winter"] {
-  display: inline;
-}
-
 // ---------- seed packets (blog cards) ----------
 .post-list {
   list-style: none;

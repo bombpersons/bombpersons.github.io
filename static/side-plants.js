@@ -37,7 +37,7 @@ function makePlant(name, season, reach, random) {
   const winter = season === 'winter';
   const plant = document.createElement('div');
   plant.className = 'edge-plant species-' + name;
-  plant.style.width = reach + 'px';
+  plant.style.width = Math.round(reach) + 'px';
   const growth = document.createElement('div');
   growth.className = 'plant-growth';
   growth.style.setProperty('--swd', (8 + random() * 5).toFixed(2) + 's');
@@ -47,12 +47,12 @@ function makePlant(name, season, reach, random) {
   const svg = svgElement('svg', { class: 'plant-stem', viewBox: `0 -110 ${reach} 220`, focusable: 'false' });
   growth.appendChild(svg);
   const scale = Math.min(1, reach / 180);
-  const length = reach * (winter ? 0.4 + random() * 0.5 : 0.3 + random() * 0.38);
-  const count = Math.max(2, Math.round(length / (30 * scale)));
+  const length = reach * (winter ? 0.4 + random() * 0.5 : 0.34 + random() * 0.4);
+  const count = Math.max(2, Math.round(length / (32 * scale)));
   // Grow gently upward; project the length so the stems reach less far inward.
-  const tilt = 0.3 + random() * 0.18;
+  const tilt = 0.2 + random() * 0.34;
   const slope = -Math.tan(tilt);
-  const bend = (random() - 0.5) * 12 * scale;
+  const bend = (random() - 0.5) * 16 * scale;
   const nodes = [];
   for (let i = 1; i <= count; i++) {
     const t = i / count;
@@ -70,13 +70,13 @@ function makePlant(name, season, reach, random) {
   function petiole(from, to) {
     svg.appendChild(svgElement('path', { d: `M${from.x} ${from.y} L${to.x} ${to.y}`, 'stroke-width': 2 }));
   }
-  function attach(parent, pick, node, angle, size, kind, offsetX = 0, offsetY = 0) {
+  function attach(parent, pick, node, angle, size, kind, offsetX = 0, offsetY = 0, back = false) {
     const radians = angle * Math.PI / 180;
     const horizontal = pick[2] * Math.abs(Math.sin(radians)) + Math.abs(Math.cos(radians)) / 2;
     const width = Math.floor(Math.min(pick[1] * size, (reach - node.x - offsetX - 4) / Math.max(0.5, horizontal)));
     if (width < 10) return;
     const image = document.createElement('img');
-    image.className = 'leafy' + (kind === 'leaf' ? '' : ' plant-accent');
+    image.className = 'leafy' + (kind === 'leaf' ? '' : ' plant-accent') + (back ? ' leafy-back' : '');
     image.dataset.attachment = kind;
     image.src = new URL(pick[0], plantBase).href;
     image.width = width;
@@ -106,11 +106,21 @@ function makePlant(name, season, reach, random) {
     }
 
     const leaf = species[name].leaf;
-    const upper = 35 + random() * 26;
-    const lower = 122 + random() * 24;
-    attach(joint, leaf, node, index === count - 1 ? 90 + Math.atan(slope) * 180 / Math.PI : upper,
-      scale * (0.75 + random() * 0.2), 'leaf');
-    attach(joint, leaf, node, lower, scale * (0.55 + random() * 0.2), 'leaf');
+    const isTip = index === count - 1;
+    const climb = (index + 1) / count;
+    const depth = 1.12 - 0.28 * climb;
+    if (random() < 0.45) {
+      attach(joint, leaf, node, 55 + random() * 85, scale * depth * (0.45 + random() * 0.25), 'leaf', 0, 0, true);
+    }
+    if (isTip) {
+      attach(joint, leaf, node, 90 + Math.atan(slope) * 180 / Math.PI, scale * depth * (0.7 + random() * 0.2), 'leaf');
+    } else {
+      attach(joint, leaf, node, 12 + random() * 62, scale * depth * (0.8 + random() * 0.4), 'leaf');
+    }
+    attach(joint, leaf, node, 108 + random() * 52, scale * depth * (0.55 + random() * 0.35), 'leaf');
+    if (!isTip && climb < 0.6 && random() < 0.4) {
+      attach(joint, leaf, node, 140 + random() * 40, scale * depth * (0.4 + random() * 0.25), 'leaf');
+    }
 
     // Flowers and hanging fruit share leaf nodes, on short visible pedicels.
     let kind = null;
@@ -130,22 +140,26 @@ function makePlant(name, season, reach, random) {
 function plantSides() {
   const season = seasons[root.dataset.season] ? root.dataset.season : 'summer';
   const reach = Math.max(56, Math.min(220, (window.innerWidth - 800) / 2 - 32));
-  const spacing = season === 'winter' ? 125 : 100;
-  const count = Math.ceil(window.innerHeight / spacing) + 2;
+  const spacing = season === 'winter' ? 190 : 145;
+  const clumps = Math.ceil(window.innerHeight / spacing) + 1;
   const seed = { spring: 11, summer: 22, autumn: 33, winter: 44 }[season];
   ['l', 'r'].forEach((side, index) => {
     const column = document.querySelector('.vines-' + side);
     if (!column) return;
     column.replaceChildren();
     if (window.innerWidth < 1000) return;
-    const random = mulberry(seed * 100 + index * 7 + count);
+    const random = mulberry(seed * 100 + index * 7 + clumps);
     const fragment = document.createDocumentFragment();
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < clumps; i++) {
       const available = seasons[season];
       const name = available[Math.floor(random() * available.length)];
-      const plant = makePlant(name, season, reach, random);
-      plant.style.top = Math.round(i * spacing - 35 + random() * 26) + 'px';
-      fragment.appendChild(plant);
+      const base = Math.round(i * spacing - 50 + random() * 44);
+      const stems = 2 + Math.floor(random() * (season === 'winter' ? 2 : 3));
+      for (let s = 0; s < stems; s++) {
+        const plant = makePlant(name, season, reach * (0.7 + random() * 0.3), random);
+        plant.style.top = Math.round(base + (random() - 0.5) * 18) + 'px';
+        fragment.appendChild(plant);
+      }
     }
     column.appendChild(fragment);
   });

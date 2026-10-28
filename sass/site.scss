@@ -244,6 +244,7 @@ img {
 .edge-plant {
   position: absolute;
   height: 0;
+  isolation: isolate;
 }
 
 .vines-l .edge-plant { left: 0; }
@@ -283,6 +284,7 @@ img {
 .stem-snow { stroke: #DFEAF0; stroke-width: 3px; }
 .plant-node { position: absolute; width: 0; height: 0; }
 .plant-accent { z-index: 1; }
+.leafy-back { z-index: -1; filter: brightness(0.8) saturate(0.85); }
 
 @keyframes plant-breeze {
   from { rotate: -0.7deg; }

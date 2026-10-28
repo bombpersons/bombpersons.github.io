@@ -99,6 +99,21 @@
       });
       seasonBtnState();
 
+      // sitelen pona / sitelen Lasina toggle
+      var stBtn = document.querySelector('.sitelen-picker .sp-sitelen');
+      function sitelenState() {
+        if (stBtn) stBtn.setAttribute('aria-pressed', root.dataset.sitelen !== 'lasina' ? 'true' : 'false');
+      }
+      if (stBtn) {
+        stBtn.addEventListener('click', function () {
+          var next = root.dataset.sitelen === 'pona' ? 'lasina' : 'pona';
+          root.dataset.sitelen = next;
+          try { localStorage.setItem('sitelen', next); } catch (e) {}
+          sitelenState();
+        });
+        sitelenState();
+      }
+
       // every hen lays an egg when clicked
       var counter = document.getElementById('egg-count');
       function eggCount() { return parseInt(localStorage.getItem('eggs') || '0', 10); }

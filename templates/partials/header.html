@@ -26,6 +26,14 @@
       document.documentElement.dataset.season = valid.indexOf(sv) > -1 ? sv : auto;
     })();
   </script>
+  <script>
+    // Sitelen mode before first paint: glyphs (pona) or Latin (lasina).
+    (function () {
+      var st = null;
+      try { st = localStorage.getItem('sitelen'); } catch (e) {}
+      document.documentElement.dataset.sitelen = st === 'lasina' ? 'lasina' : 'pona';
+    })();
+  </script>
   <script src="{{ get_url(path='sky.js', cachebust=true) }}"></script>
   <link rel="stylesheet" href="{{ get_url(path='site.css', cachebust=true) }}">
   <script type="module" src="{{ get_url(path='banner.js', cachebust=true) }}"></script>
@@ -61,6 +69,10 @@
     <strong class="banner-text">
       <span class="banner-carrot" aria-hidden="true">{{ <carrot /> }}</span>maisy.land<span class="banner-carrot" aria-hidden="true">{{ <carrot /> }}</span>
     </strong>
+    <span class="toki banner-sub">
+      <span class="sitelen-only">ma [meli en sike ike]</span>
+      <span class="lasina-only">ma Mesi</span>
+    </span>
     <span class="banner-echoes" aria-hidden="true"></span>
     <span class="banner-sparkles" aria-hidden="true"></span>
   </a>
@@ -75,6 +87,9 @@
         <button type="button" class="sp sp-summer" data-set="summer" aria-label="Summer" title="Summer">{{ <tomato /> }}</button>
         <button type="button" class="sp sp-autumn" data-set="autumn" aria-label="Autumn" title="Autumn">{{ <pumpkin /> }}</button>
         <button type="button" class="sp sp-winter" data-set="winter" aria-label="Winter" title="Winter">{{ <leek /> }}</button>
+      </div>
+      <div class="sitelen-picker" role="group" aria-label="Sitelen pona">
+        <button type="button" class="sp sp-sitelen" aria-pressed="true" title="sitelen pona / sitelen Lasina">sitelen&amp;pona</button>
       </div>
       <div class="sky-control" hidden>
         <label for="sky-time">Sky</label>

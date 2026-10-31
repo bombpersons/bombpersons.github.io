@@ -83,11 +83,12 @@ def erase(im, cx, cy, rx, ry):
                 px(im, x, y, (0, 0, 0, 0))
 
 
-def lens(im, cx, y0, y1, maxw, c, serrate=False, pow=0.7):
-    """Pointed oval: widest in the middle, tips at both ends."""
+def lens(im, cx, y0, y1, maxw, c, serrate=False, pow=0.7, peak=0.5):
+    """Pointed oval: widest at `peak` of its length, tips at both ends."""
     for y in range(y0, y1 + 1):
         t = (y - y0) / max(1, y1 - y0)
-        hw = round((maxw / 2) * (math.sin(math.pi * t) ** pow))
+        seg = min(t / peak, (1 - t) / (1 - peak))
+        hw = round((maxw / 2) * (math.sin(math.pi * seg / 2) ** pow))
         hline(im, cx - hw, cx + hw, y, c)
         if serrate and 0 < y - y0 < y1 - y0 and y % 3 == 0 and hw > 1:
             px(im, cx - hw - 1, y, c)
@@ -163,11 +164,10 @@ def apple_leaf():
     im = canvas(44, 44)
     lens(im, 22, 1, 42, 24, LEAF, serrate=True, pow=1.15)
     vline(im, 22, 5, 40, LEAF_D)
-    line(im, 22, 12, 16, 18, LEAF_D)
-    line(im, 22, 17, 28, 23, LEAF_D)
-    line(im, 22, 22, 16, 28, LEAF_D)
-    line(im, 22, 27, 27, 32, LEAF_D)
-    rect(im, 9, 6, 3, 3, LEAF_L)
+    line(im, 22, 16, 15, 11, LEAF_D)
+    line(im, 22, 21, 29, 16, LEAF_D)
+    line(im, 22, 26, 15, 21, LEAF_D)
+    line(im, 22, 31, 29, 26, LEAF_D)
     rect(im, 20, 42, 4, 2, BROWN)
     outline(im, LEAF_O)
     return im
@@ -225,19 +225,30 @@ def apple_branch():
 
 
 def bean_leaf():
-    im = canvas(40, 48)
-    vline(im, 19, 26, 47, BEAN_D)
-    vline(im, 20, 26, 47, BEAN_D)
-    lf = canvas(18, 9)
-    ellipse(lf, 9, 4, 8, 4, BEAN)
-    line(lf, 2, 4, 16, 4, BEAN_D)
-    rot_paste(im, lf, -28, 1, 4)
-    rot_paste(im, lf, 28, 21, 3)
-    lf2 = canvas(14, 7)
-    ellipse(lf2, 7, 3, 6, 3, BEAN)
-    line(lf2, 2, 3, 12, 3, BEAN_D)
-    rot_paste(im, lf2, -22, 5, 19)
-    rot_paste(im, lf2, 22, 21, 18)
+    # broad bean: two pairs of large fleshy leaflets + big terminal one
+    im = canvas(56, 50)
+    BL = (112, 148, 124)
+    BL_D = (80, 112, 94)
+    vline(im, 27, 36, 49, BL_D)
+    vline(im, 28, 36, 49, BL_D)
+    ellipse(im, 27, 9, 11, 9, BL)
+    vline(im, 27, 12, 17, BL_D)
+    line(im, 27, 15, 21, 12, BL_D)
+    line(im, 27, 15, 33, 12, BL_D)
+    lf = canvas(21, 12)
+    ellipse(lf, 10, 6, 9, 5, BL)
+    line(lf, 2, 6, 19, 6, BL_D)
+    line(lf, 7, 3, 5, 8, BL_D)
+    line(lf, 13, 3, 15, 8, BL_D)
+    lfm = lf.transpose(Image.FLIP_LEFT_RIGHT)
+    rot_paste(im, lf, -26, 0, 15)
+    rot_paste(im, lfm, 26, 35, 15)
+    lf2 = canvas(19, 11)
+    ellipse(lf2, 9, 5, 8, 4, BL)
+    line(lf2, 2, 5, 17, 5, BL_D)
+    lf2m = lf2.transpose(Image.FLIP_LEFT_RIGHT)
+    rot_paste(im, lf2, -18, 2, 28)
+    rot_paste(im, lf2m, 18, 36, 28)
     outline(im, BEAN_O)
     return im
 
@@ -270,20 +281,27 @@ def bean_pod():
 
 
 def straw_leaf():
-    im = canvas(38, 38)
-    lens(im, 19, 1, 16, 18, LEAF, serrate=True)
-    vline(im, 19, 4, 13, LEAF_D)
-    lf = canvas(16, 9)
-    ellipse(lf, 8, 4, 7, 4, LEAF)
-    line(lf, 2, 4, 14, 4, LEAF_D)
-    for x in range(3, 14, 3):
-        px(lf, x, 1, LEAF_D)
-    rot_paste(im, lf, 38, 0, 15)
-    rot_paste(im, lf, -38, 21, 15)
-    line(im, 19, 17, 19, 26, LEAF_D)
-    line(im, 12, 22, 18, 28, LEAF_D)
-    line(im, 26, 22, 20, 28, LEAF_D)
-    line(im, 19, 28, 19, 36, BEAN_D)
+    im = canvas(44, 42)
+    # top leaflet: obovate (widest near the tip), sawtooth edges, veins
+    lens(im, 22, 1, 17, 20, LEAF, serrate=True, peak=0.62)
+    vline(im, 22, 3, 14, LEAF_D)
+    for y in (5, 8, 11):
+        line(im, 22, y, 17, y + 3, LEAF_D)
+        line(im, 22, y, 27, y + 3, LEAF_D)
+    ellipse(im, 22, 10, 5, 3, LEAF_L)
+    lf = canvas(17, 10)
+    lens(lf, 8, 0, 8, 15, LEAF, serrate=True, peak=0.62)
+    line(lf, 2, 4, 15, 4, LEAF_D)
+    line(lf, 8, 3, 4, 6, LEAF_D)
+    line(lf, 11, 3, 14, 6, LEAF_D)
+    ellipse(lf, 9, 5, 4, 2, LEAF_L)
+    lfm = lf.transpose(Image.FLIP_LEFT_RIGHT)
+    rot_paste(im, lf, 46, 0, 16)
+    rot_paste(im, lfm, -46, 27, 16)
+    line(im, 22, 16, 22, 27, LEAF_D)
+    line(im, 12, 21, 19, 28, LEAF_D)
+    line(im, 32, 21, 25, 28, LEAF_D)
+    line(im, 22, 27, 22, 37, BEAN_D)
     outline(im, LEAF_O)
     return im
 
@@ -327,17 +345,31 @@ def strawberry():
 
 
 def tomato_leaf():
-    im = canvas(44, 40)
-    lens(im, 22, 1, 22, 24, (79, 130, 86), serrate=True)
-    vline(im, 22, 4, 20, (53, 96, 62))
-    vline(im, 22, 20, 38, (62, 107, 69))
-    lf = canvas(12, 6)
-    ellipse(lf, 6, 3, 5, 3, (79, 130, 86))
-    line(lf, 1, 3, 11, 3, (53, 96, 62))
-    rot_paste(im, lf, 38, 1, 11)
-    rot_paste(im, lf, -38, 25, 13)
-    rot_paste(im, lf, 30, 3, 18)
-    rot_paste(im, lf, -30, 27, 19)
+    # pinnate compound leaf: rachis, big serrated tip, 3 shrinking leaflet pairs
+    im = canvas(58, 50)
+    T = (79, 130, 86)
+    TD = (53, 96, 62)
+    vline(im, 29, 12, 49, TD)
+    lens(im, 29, 1, 15, 17, T, serrate=True)
+    vline(im, 29, 3, 13, TD)
+    lf1 = canvas(16, 7)
+    lens(lf1, 8, 0, 6, 14, T, serrate=True, peak=0.6)
+    line(lf1, 1, 3, 15, 3, TD)
+    lf2 = canvas(13, 6)
+    lens(lf2, 6, 0, 5, 11, T, serrate=True, peak=0.6)
+    line(lf2, 1, 2, 12, 2, TD)
+    lf3 = canvas(10, 5)
+    lens(lf3, 5, 0, 4, 8, T, serrate=True, peak=0.6)
+    line(lf3, 1, 2, 9, 2, TD)
+    lf1m = lf1.transpose(Image.FLIP_LEFT_RIGHT)
+    rot_paste(im, lf1, 40, 30, 18)
+    rot_paste(im, lf1m, -40, 13, 18)
+    lf2m = lf2.transpose(Image.FLIP_LEFT_RIGHT)
+    rot_paste(im, lf2, 32, 31, 27)
+    rot_paste(im, lf2m, -32, 16, 27)
+    lf3m = lf3.transpose(Image.FLIP_LEFT_RIGHT)
+    rot_paste(im, lf3, 26, 32, 35)
+    rot_paste(im, lf3m, -26, 17, 35)
     outline(im, (36, 62, 40))
     return im
 
@@ -379,28 +411,77 @@ def kale():
     return im
 
 
+def limb(im, bx, by, angle_deg, length, halfw, c, peak=0.55):
+    """Rounded pointed limb (lobe/leaflet) from (bx,by) at an angle:
+    0 degrees points straight down, positive angles swing toward +x."""
+    a = math.radians(angle_deg)
+    dx, dy = math.sin(a), math.cos(a)
+    steps = max(8, int(length * 1.6))
+    for i in range(steps + 1):
+        t = i / steps
+        seg = min(t / peak, (1 - t) / (1 - peak))
+        hw = max(1, round(halfw * (math.sin(math.pi * seg / 2) ** 0.8)))
+        ellipse(im, round(bx + dx * t * length), round(by + dy * t * length), hw, hw, c)
+
+
 def squash_leaf():
-    im = canvas(74, 64)
-    ellipse(im, 37, 36, 32, 22, SQUASH)
-    ellipse(im, 21, 18, 13, 10, SQUASH)
-    ellipse(im, 53, 18, 13, 10, SQUASH)
-    erase(im, 37, 2, 4, 7)  # heart notch
-    vline(im, 36, 6, 50, SQUASH_D)
-    vline(im, 37, 6, 50, SQUASH_D)
-    line(im, 36, 14, 16, 24, SQUASH_D)
-    line(im, 38, 14, 58, 24, SQUASH_D)
-    line(im, 36, 24, 22, 38, SQUASH_D)
-    line(im, 38, 24, 52, 38, SQUASH_D)
-    line(im, 37, 30, 34, 44, SQUASH_D)
-    rect(im, 12, 30, 4, 3, SQUASH_L)
-    rect(im, 54, 32, 4, 3, SQUASH_L)
-    rect(im, 28, 40, 4, 3, SQUASH_L)
-    # Attach at the notch where the veins meet, then flip stem-down below.
-    rect(im, 34, 0, 5, 10, BEAN_D)
+    # palmate leaf: the silhouette is a sum-of-gaussians lobe envelope around
+    # the base point, so lobes and their sinuses fall out of one fill pass
+    im = canvas(84, 76)
+    bx, by = 41, 8
+    lobes = [(0, 56, 20), (-42, 40, 15), (42, 40, 15), (-78, 22, 11), (78, 22, 11)]
+    for y in range(by, 76):
+        for x in range(6, 78):
+            dx, dy = x - bx, y - by
+            dist = math.hypot(dx, dy)
+            if dist < 2 or dist > 62:
+                continue
+            ang = math.degrees(math.atan2(dx, dy))
+            env = 0.0
+            for a0, length, spread in lobes:
+                d = (ang - a0) / (spread * 1.05)
+                env += length * math.exp(-d * d)
+            env = min(max(env, 28 - dist * 0.14), 60)
+            # organic edge: a touch of deterministic jitter on the rim
+            wobble = ((x * 7 + y * 13) % 5 - 2) * 0.9
+            if dist <= env + wobble and abs(dx) <= env * 0.9 + 4:
+                im.putpixel((x, y), SQUASH)
+    # palmate veins reaching into each lobe
+    for a0, length, spread in lobes:
+        a = math.radians(a0)
+        line(im, bx, by + 3, round(bx + math.sin(a) * length * 0.72),
+             round(by + math.cos(a) * length * 0.72), SQUASH_D)
+        for f in (0.36, 0.56):
+            vx = round(bx + math.sin(a) * length * f)
+            vy = round(by + math.cos(a) * length * f)
+            line(im, vx, vy, vx - 4, vy + 2, SQUASH_D)
+            line(im, vx, vy, vx + 4, vy + 2, SQUASH_D)
+    erase(im, bx - 3, by - 4, 3, 5)  # heart notch
+    rect(im, bx - 3, by - 1, 6, 9, BEAN_D)
+    for fx, fy in ((16, 18), (62, 22), (26, 36), (56, 40), (38, 52)):
+        for yy in range(fy, fy + 3):
+            for xx in range(fx, fx + 4):
+                if im.getpixel((xx, yy)) == SQUASH:
+                    im.putpixel((xx, yy), SQUASH_L)
     outline(im, SQUASH_O)
-    # flip: notch + vein convergence belong at the stem end (the attachment),
-    # so the lobes fan inward when the leaf pokes from an edge
+    # flip so the attachment notch sits at the stem end
     im = im.transpose(Image.FLIP_TOP_BOTTOM)
+    return im
+
+
+def squash_tendril():
+    # coiled tendril: a thin spiral with a short lead-in stalk
+    im = canvas(26, 26)
+    pts = []
+    for i in range(44):
+        t = i / 43
+        a = t * 3.5 * math.pi
+        r = 1.2 + t * 6.5
+        pts.append((9 + r * math.cos(a), 13 + r * math.sin(a)))
+    line(im, 2, 24, pts[0][0].__round__(), pts[0][1].__round__(), SQUASH_D)
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        line(im, round(x0), round(y0), round(x1), round(y1), SQUASH_D)
+    outline(im, SQUASH_O)
     return im
 
 
@@ -452,6 +533,83 @@ def tomato():
 
 # ---------------------------------------------------------------- main
 
+def pine_needles():
+    im = canvas(28, 26)
+    P = (74, 118, 90)
+    PD = (52, 88, 68)
+    bx, by = 14, 24
+    for i, (ang, ln) in enumerate([(-48, 21), (-24, 23), (0, 24), (24, 23), (48, 21)]):
+        a = math.radians(ang)
+        col = P if i % 2 == 0 else PD
+        bend = 2.4 if i < 2 else (-2.4 if i > 2 else 0)
+        prev = (bx, by)
+        for k in range(1, 13):
+            t = k / 12
+            x = bx + math.sin(a) * t * ln + math.sin(t * math.pi) * bend
+            y = by - math.cos(a) * t * ln
+            line(im, prev[0], prev[1], round(x), round(y), col)
+            prev = (round(x), round(y))
+    px(im, bx, by, PD)
+    return im
+
+
+def pinecone():
+    im = canvas(16, 20)
+    PC = (120, 88, 58)
+    PCD = (92, 66, 42)
+    for y in range(20):
+        for x in range(16):
+            dx, dy = x - 7.5, (y - 9.5) / 1.25
+            if dx * dx + dy * dy <= 36:
+                px(im, x, y, PC)
+    for o in range(-14, 22, 4):
+        for y in range(20):
+            for x in range(16):
+                dx, dy = x - 7.5, (y - 9.5) / 1.25
+                if dx * dx + dy * dy <= 30 and (x - y == o or x + y == o + 4):
+                    px(im, x, y, PCD)
+    vline(im, 7, 0, 3, (74, 118, 90))
+    vline(im, 8, 0, 2, (74, 118, 90))
+    outline(im, (70, 50, 34))
+    return im
+
+
+def basket():
+    im = canvas(116, 66)
+    # chains from the top of the page down to the rim
+    for cx in (22, 94):
+        vline(im, cx, 0, 26, (128, 130, 138))
+        vline(im, cx + 1, 0, 26, (94, 96, 104))
+    # soil dome sitting proud of the rim
+    ellipse(im, 58, 20, 45, 7, (56, 40, 28))
+    for x in (30, 46, 66, 82):
+        px(im, x, 17, (74, 56, 40))
+    # woven bowl: half-ellipse rows in alternating wicker bands
+    RIM, H = 28, 36
+    bands = [(150, 112, 66), (128, 94, 54), (106, 76, 42), (128, 94, 54)]
+    for y in range(RIM, RIM + H):
+        t = (y - RIM) / (H - 1)
+        halfw = round(50 * math.sqrt(max(0.0, 1 - t * t)))
+        if halfw < 1:
+            continue
+        col = bands[((y - RIM) // 5) % 4]
+        for x in range(58 - halfw, 58 + halfw):
+            px(im, x, y, col)
+    # vertical weave ribs
+    for y in range(RIM, RIM + H):
+        t = (y - RIM) / (H - 1)
+        halfw = round(50 * math.sqrt(max(0.0, 1 - t * t)))
+        if halfw < 1:
+            continue
+        for x in range(58 - halfw, 58 + halfw, 8):
+            px(im, x, y, (96, 68, 38))
+    # rim band + highlight
+    hline(im, 8, 108, RIM, (94, 64, 34))
+    hline(im, 8, 108, RIM - 1, (170, 132, 80))
+    outline(im, (74, 52, 34))
+    return im
+
+
 SPRITES = {
     "apple-leaf": apple_leaf,
     "apple-blossom": apple_blossom,
@@ -467,9 +625,13 @@ SPRITES = {
     "tomato-flower": tomato_flower,
     "kale": kale,
     "squash-leaf": squash_leaf,
+    "squash-tendril": squash_tendril,
     "squash-flower": squash_flower,
     "pumpkin": pumpkin,
     "tomato-fruit": tomato,
+    "pine-needles": pine_needles,
+    "pinecone": pinecone,
+    "basket": basket,
 }
 
 

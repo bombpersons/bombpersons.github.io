@@ -75,6 +75,7 @@
 body {
   background-color: var(--sky-horizon);
   isolation: isolate;
+  position: relative;
   color: var(--ink);
   font-family: "Short Stack", "Comic Sans MS", cursive;
   font-size: 1.05rem;
@@ -260,9 +261,6 @@ img {
   position: relative;
   width: 100%;
   height: 0;
-  transform-origin: -8px 0;
-  animation: plant-breeze var(--swd, 10s) ease-in-out infinite alternate;
-  animation-delay: var(--sway-delay, 0s);
   --stem-main: #4B7044;
   --stem-light: #83A165;
 }
@@ -270,6 +268,20 @@ img {
 .species-apple .plant-growth {
   --stem-main: #73543E;
   --stem-light: #A3825A;
+}
+
+.species-pine .plant-growth {
+  --stem-main: #6B4A2F;
+  --stem-light: #93704B;
+}
+
+.plant-basket {
+  position: absolute;
+  top: 0;
+  left: 7px;
+  width: 116px;
+  image-rendering: pixelated;
+  pointer-events: none;
 }
 
 .plant-stem {
@@ -292,9 +304,18 @@ img {
 .plant-accent { z-index: 1; }
 .leafy-back { z-index: -1; filter: brightness(0.8) saturate(0.85); }
 
-@keyframes plant-breeze {
-  from { rotate: -0.7deg; }
-  to { rotate: 0.7deg; }
+// leaves nod individually; the rotate channel composes with each leaf's
+// fan rotation, pivoting at the leaf stalk (transform-origin 50% 100%)
+@media (prefers-reduced-motion: no-preference) {
+  .leafy {
+    animation: leaf-breeze var(--swd, 10s) ease-in-out infinite alternate;
+    animation-delay: var(--sway-delay, 0s);
+  }
+}
+
+@keyframes leaf-breeze {
+  from { rotate: -3deg; }
+  to { rotate: 4.5deg; }
 }
 
 // falling leaves
@@ -378,12 +399,13 @@ img {
   i:nth-child(14) { left: 96%; --d: 22s; --dl: -20s; --s: 4.4s; }
 }
 
-// side vines framing the page
+// side vines framing the page — document-anchored so plants stand on the
+// farmyard ground and scroll with the page
 .vines {
-  position: fixed;
+  position: absolute;
+  z-index: 5;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
   display: none;
   overflow: hidden;
 }
@@ -493,9 +515,6 @@ footer {
   text-align: center;
 }
 
-.banner:hover .banner-text,
-.banner:focus-visible .banner-text { color: var(--accent-strong); }
-
 .banner-carrot svg {
   display: block;
   width: 1.05em;
@@ -519,10 +538,13 @@ footer {
 }
 
 .banner-sub {
+  grid-area: auto;
   position: absolute;
-  bottom: 0.3rem;
-  right: 12rem;
+  top: 0.4rem;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 4;
+  text-align: center;
   font-size: 1.1rem;
   color: #A3440E;
   line-height: 1.3;
@@ -535,7 +557,7 @@ footer {
   font-feature-settings: "liga" 1, "clig" 1, "calt" 1, "kern" 1, "mark" 1;
   text-rendering: optimizeLegibility;
   line-height: 1.45;
-  font-size: 1.12em;
+  font-size: 1.2em;
 }
 
 [data-sitelen="pona"] .lasina-only { display: none; }
@@ -1015,6 +1037,7 @@ footer {
   --pond-right: 4cqw;
   --pond-left: calc(100cqw - var(--pond-right) - var(--pond-width));
   position: relative;
+  z-index: -1;
   width: 100%;
   height: 224px;
   overflow: hidden;
@@ -1551,7 +1574,7 @@ footer {
   // freeze the farmyard: everyone stands very still
   .scene .hen-flock[data-state] svg,
   .scene .runner[data-state] svg,
-  .plant-growth,
+  .leafy,
   .side,
   .coop .zzz,
   .scene .fireflies i {
@@ -1573,4 +1596,52 @@ footer {
   .beds {
     grid-template-columns: 1fr;
   }
+}
+
+// plucked plants fly in a fixed overlay above everything
+.plucked-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+
+  img,
+  canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    will-change: transform;
+    image-rendering: pixelated;
+  }
+}
+
+.fallen-fruit {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+// only the sprites themselves are grabbable; the strips stay click-through
+.vines img {
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+// back leaves paint behind the stem svg, whose rects would otherwise swallow
+// their clicks
+.vines svg,
+.vines svg * {
+  pointer-events: none;
+}
+
+.vines img:active {
+  cursor: grabbing;
+}
+
+.vines img.plant-basket {
+  cursor: default;
 }

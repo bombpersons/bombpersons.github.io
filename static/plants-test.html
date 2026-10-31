@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>plant graph test</title>
+  <link rel="stylesheet" href="/site.css">
+  <style>
+    body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: "Short Stack", "Comic Sans MS", cursive; }
+    .controls { display: flex; flex-wrap: wrap; gap: 0.9rem; align-items: center; padding: 0.6rem 1rem; background: var(--chip); border-bottom: 2px solid var(--line); font-size: 0.85rem; color: var(--ink); }
+    .controls label { display: inline-flex; gap: 0.35rem; align-items: center; }
+    .controls select { font: inherit; }
+    .controls button { font: inherit; padding: 0.15rem 0.8rem; border: 2px solid var(--line); border-radius: 6px; background: var(--chip); color: var(--ink); cursor: pointer; }
+    .controls button:hover { background: var(--line); }
+    .seed { font-variant-numeric: tabular-nums; opacity: 0.75; }
+    .stage { position: relative; flex: 1; overflow: hidden; cursor: pointer; background: var(--sky-horizon); }
+    .stage .edge-plant { left: 0; bottom: 0; transform-origin: 0 0; transform: rotate(-90deg); }
+    .hint { position: absolute; right: 0.8rem; bottom: 0.5rem; font-size: 0.75rem; opacity: 0.6; color: var(--ink); pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <label>plant <select id="species"></select></label>
+    <label>season
+      <select id="season">
+        <option>spring</option>
+        <option selected>summer</option>
+        <option>autumn</option>
+        <option>winter</option>
+      </select>
+    </label>
+    <label>height <input id="size" type="range" min="60" max="900" value="560"></label>
+    <label>growth <input id="growth" type="range" min="0" max="100" value="100"></label>
+    <button id="reroll" type="button">re-roll</button>
+    <span class="seed">seed <span id="seed-label"></span></span>
+  </div>
+  <div class="stage" id="stage"><span class="hint">click the stage to re-roll &middot; URL params: ?species=&amp;season=&amp;seed=&amp;size=</span></div>
+  <script type="module">
+    import { generatePlant, speciesNames, speciesConfigs } from '/plant-graph-model.js';
+    import { renderPlant } from '/plant-graph.js';
+
+    const params = new URLSearchParams(location.search);
+    const stage = document.getElementById('stage');
+    const speciesSelect = document.getElementById('species');
+    const seasonSelect = document.getElementById('season');
+    const sizeInput = document.getElementById('size');
+    const rerollBtn = document.getElementById('reroll');
+    const seedLabel = document.getElementById('seed-label');
+
+    const state = {
+      species: params.get('species') || 'apple',
+      season: params.get('season') || 'summer',
+      size: parseInt(params.get('size') || '560', 10),
+      growth: parseInt(params.get('growth') || '100', 10),
+      seed: parseInt(params.get('seed') || String((Math.random() * 1e9) | 0), 10)
+    };
+
+    speciesNames.forEach(name => {
+      const option = document.createElement('option');
+      option.value = name;
+      option.textContent = speciesConfigs[name].label;
+      speciesSelect.appendChild(option);
+    });
+    speciesSelect.value = state.species;
+    seasonSelect.value = state.season;
+    sizeInput.value = state.size;
+    document.getElementById('growth').value = state.growth;
+
+    const growthInput = document.getElementById('growth');
+
+    function render() {
+      const existing = stage.querySelector('.edge-plant');
+      if (existing) existing.remove();
+      const plant = generatePlant(state.species, { season: state.season, seed: state.seed, height: state.size, width: 230 });
+      renderPlant(plant, stage, state.growth / 100);
+      seedLabel.textContent = state.seed;
+    }
+
+    function reroll() {
+      state.seed = (Math.random() * 1e9) | 0;
+      render();
+    }
+
+    speciesSelect.addEventListener('change', () => { state.species = speciesSelect.value; render(); });
+    seasonSelect.addEventListener('change', () => { state.season = seasonSelect.value; render(); });
+    sizeInput.addEventListener('input', () => { state.size = parseInt(sizeInput.value, 10); render(); });
+    growthInput.addEventListener('input', () => { state.growth = parseInt(growthInput.value, 10); render(); });
+    rerollBtn.addEventListener('click', reroll);
+    stage.addEventListener('click', reroll);
+    render();
+  </script>
+</body>
+</html>

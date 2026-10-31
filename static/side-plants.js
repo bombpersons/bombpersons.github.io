@@ -1,174 +1,336 @@
-const root = document.documentElement;
-const plantBase = new URL('./images/plants/', import.meta.url);
-const svgNS = 'http://www.w3.org/2000/svg';
+import { generatePlant, mulberry } from './plant-graph-model.js';
+import { renderPlant } from './plant-graph.js';
 
-// Each stem belongs to one species. Entries are [file, width, height/width].
-const species = {
-  apple: { leaf: ['apple-leaf.png', 72, 1], flower: ['apple-blossom.png', 30, 1], fruit: ['apple-fruit.png', 34, 1.125] },
-  bean: { leaf: ['bean-leaf.png', 60, 1.2], flower: ['bean-flower.png', 26, 32 / 28], fruit: ['bean-pod.png', 26, 46 / 30] },
-  strawberry: { leaf: ['strawberry-leaf.png', 60, 1], flower: ['strawberry-flower.png', 24, 1], fruit: ['strawberry.png', 19, 1.2] },
-  tomato: { leaf: ['tomato-leaf.png', 72, 40 / 44], flower: ['tomato-flower.png', 24, 1], fruit: ['tomato-fruit.png', 28, 1] },
-  kale: { leaf: ['kale.png', 94, 56 / 64] },
-  squash: { leaf: ['squash-leaf.png', 104, 64 / 74], flower: ['squash-flower.png', 38, 42 / 38], fruit: ['pumpkin.png', 52, 38 / 42] }
-};
+const root = document.documentElement;
+
+// Each side grows one column plant, rooted on the farmyard ground line and
+// climbing the full height of the page.
 const seasons = {
   spring: ['apple', 'bean', 'strawberry'],
   summer: ['apple', 'bean', 'strawberry', 'tomato', 'kale', 'squash'],
   autumn: ['apple', 'strawberry', 'tomato', 'kale', 'squash'],
-  winter: ['apple']
+  winter: ['pine', 'apple']
 };
+const HANGERS = ['strawberry', 'squash'];
+const seasonNames = Object.keys(seasons);
 
-function mulberry(seed) {
-  return () => {
-    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+// a fresh plant identity per page load, kept across season/resize regrows
+const seeds = { l: 1 + Math.floor(Math.random() * 1e6), r: 1 + Math.floor(Math.random() * 1e6) };
+const animations = { l: 0, r: 0 };
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const freezeT = new URLSearchParams(location.search).get('freeze');
+// ?raf=1: headless browsers never fire rAF, so let timers drive it to test the
+// real animation path with --virtual-time-budget
+if (new URLSearchParams(location.search).has('raf')) {
+  window.requestAnimationFrame = cb => setTimeout(() => cb(performance.now()), 16);
+  window.cancelAnimationFrame = id => clearTimeout(id);
 }
 
-function svgElement(name, attributes) {
-  const element = document.createElementNS(svgNS, name);
-  Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
-  return element;
+function groundLine() {
+  const ground = document.querySelector('.ground-surface') || document.querySelector('.ground');
+  if (ground) return Math.round(ground.getBoundingClientRect().top + window.scrollY);
+  return Math.max(420, document.documentElement.scrollHeight - 140);
 }
 
-function makePlant(name, season, reach, random) {
-  const winter = season === 'winter';
-  const plant = document.createElement('div');
-  plant.className = 'edge-plant species-' + name;
-  plant.style.width = Math.round(reach) + 'px';
-  const growth = document.createElement('div');
-  growth.className = 'plant-growth';
-  growth.style.setProperty('--swd', (8 + random() * 5).toFixed(2) + 's');
-  growth.style.setProperty('--sway-delay', (-random() * 10).toFixed(2) + 's');
-  plant.appendChild(growth);
-
-  const svg = svgElement('svg', { class: 'plant-stem', viewBox: `0 -110 ${reach} 220`, focusable: 'false' });
-  growth.appendChild(svg);
-  const scale = Math.min(1, reach / 180);
-  const length = reach * (winter ? 0.4 + random() * 0.5 : 0.34 + random() * 0.4);
-  const count = Math.max(2, Math.round(length / (32 * scale)));
-  // Grow gently upward; project the length so the stems reach less far inward.
-  const tilt = 0.2 + random() * 0.34;
-  const slope = -Math.tan(tilt);
-  const bend = (random() - 0.5) * 16 * scale;
-  const nodes = [];
-  for (let i = 1; i <= count; i++) {
-    const t = i / count;
-    nodes.push({
-      x: Math.round(-8 + (length + 8) * Math.cos(tilt) * t),
-      y: Math.round(-(length + 8) * Math.sin(tilt) * t + Math.sin(t * Math.PI) * bend)
+function grow(side, plants, column, hanging, groundY) {
+  const els = [];
+  let skip = 0;
+  if (hanging) {
+    const basket = document.createElement('img');
+    basket.src = '/images/plants/basket.png';
+    basket.className = 'plant-basket';
+    basket.alt = '';
+    basket.draggable = false;
+    column.appendChild(basket);
+    plants.forEach(plant => {
+      const plantEl = renderPlant(plant, column, 0);
+      plantEl.dataset.hanging = '1';
+      // rotate(90deg) maps the root (y = 62..70) to -62..-70, so the right side
+      // anchors at 100% to land the plant under the basket instead of mid-air
+      plantEl.style.left = side === 'l' ? '0' : '100%';
+      plantEl.style.top = '26px';
+      plantEl.style.transformOrigin = '0 0';
+      plantEl.style.transform = side === 'l' ? 'scaleX(-1) rotate(90deg)' : 'rotate(90deg)';
+      els.push(plantEl);
     });
+  } else {
+    plants.forEach(plant => {
+      const plantEl = renderPlant(plant, column, 0);
+      plantEl.dataset.hanging = '0';
+      plantEl.style.left = side === 'l' ? '0' : '100%';
+      plantEl.style.top = groundY + 'px';
+      plantEl.style.transformOrigin = '0 0';
+      plantEl.style.transform = side === 'l' ? 'rotate(-90deg)' : 'scaleX(-1) rotate(-90deg)';
+      els.push(plantEl);
+    });
+    // skip ahead so the tip already pokes up from the bottom edge of the screen
+    const visible = Math.max(0, groundY - window.innerHeight);
+    skip = 0.9;
+    plants.forEach(plant => plant.nodes.forEach(n => { if (n.x >= visible && n.birth < skip) skip = n.birth; }));
+    skip = Math.min(skip, 0.92);
   }
-  plant.dataset.length = length.toFixed(1);
-  let path = 'M-8 0';
-  nodes.forEach(node => { path += ` L${node.x} ${node.y}`; });
-  svg.appendChild(svgElement('path', { d: path, 'stroke-width': winter ? 3 : 3.5 }));
-  svg.appendChild(svgElement('path', { d: path, class: 'stem-highlight', 'stroke-width': 1, transform: 'translate(0,-1)' }));
-
-  function petiole(from, to) {
-    svg.appendChild(svgElement('path', { d: `M${from.x} ${from.y} L${to.x} ${to.y}`, 'stroke-width': 2 }));
+  if (reducedMotion) {
+    els.forEach(el => el.setGrowth(1));
+    return;
   }
-  function attach(parent, pick, node, angle, size, kind, offsetX = 0, offsetY = 0, back = false) {
-    const radians = angle * Math.PI / 180;
-    const horizontal = pick[2] * Math.abs(Math.sin(radians)) + Math.abs(Math.cos(radians)) / 2;
-    const width = Math.floor(Math.min(pick[1] * size, (reach - node.x - offsetX - 4) / Math.max(0.5, horizontal)));
-    if (width < 10) return;
-    const image = document.createElement('img');
-    image.className = 'leafy' + (kind === 'leaf' ? '' : ' plant-accent') + (back ? ' leafy-back' : '');
-    image.dataset.attachment = kind;
-    image.src = new URL(pick[0], plantBase).href;
-    image.width = width;
-    image.alt = '';
-    image.draggable = false;
-    image.style.left = (offsetX - width / 2) + 'px';
-    image.style.top = (offsetY - width * pick[2]) + 'px';
-    // Every source sprite has its stem at the bottom; that point is the node.
-    image.style.transform = `rotate(${angle.toFixed(1)}deg)`;
-    parent.appendChild(image);
+  if (freezeT !== null) {
+    els.forEach(el => el.setGrowth(parseFloat(freezeT)));
+    return;
   }
-
-  nodes.forEach((node, index) => {
-    const joint = document.createElement('span');
-    joint.className = 'plant-node';
-    joint.style.left = node.x + 'px';
-    joint.style.top = node.y + 'px';
-    growth.appendChild(joint);
-    svg.appendChild(svgElement('rect', { x: node.x - 2, y: node.y - 2, width: 4, height: 4, class: 'stem-node' }));
-
-    if (winter) {
-      const direction = index % 2 ? 1 : -1;
-      const tip = { x: node.x + 5 + random() * 10, y: node.y + direction * (10 + random() * 12) };
-      petiole(node, tip);
-      svg.appendChild(svgElement('path', { d: `M${node.x - 5} ${node.y - 3}h8`, class: 'stem-snow' }));
-      return;
-    }
-
-    const leaf = species[name].leaf;
-    const isTip = index === count - 1;
-    const climb = (index + 1) / count;
-    const depth = 1.12 - 0.28 * climb;
-    if (random() < 0.45) {
-      attach(joint, leaf, node, 55 + random() * 85, scale * depth * (0.45 + random() * 0.25), 'leaf', 0, 0, true);
-    }
-    if (isTip) {
-      attach(joint, leaf, node, 90 + Math.atan(slope) * 180 / Math.PI, scale * depth * (0.7 + random() * 0.2), 'leaf');
-    } else {
-      attach(joint, leaf, node, 12 + random() * 62, scale * depth * (0.8 + random() * 0.4), 'leaf');
-    }
-    attach(joint, leaf, node, 108 + random() * 52, scale * depth * (0.55 + random() * 0.35), 'leaf');
-    if (!isTip && climb < 0.6 && random() < 0.4) {
-      attach(joint, leaf, node, 140 + random() * 40, scale * depth * (0.4 + random() * 0.25), 'leaf');
-    }
-
-    // Flowers and hanging fruit share leaf nodes, on short visible pedicels.
-    let kind = null;
-    if (season === 'spring' && species[name].flower && random() < 0.4) kind = 'flower';
-    if (season === 'summer' && random() < 0.3) kind = random() < 0.6 ? 'fruit' : 'flower';
-    if (season === 'autumn' && random() < 0.45) kind = 'fruit';
-    if (kind && species[name][kind]) {
-      const offset = { x: Math.round(7 * scale), y: Math.round((kind === 'fruit' ? 9 : -9) * scale) };
-      petiole(node, { x: node.x + offset.x, y: node.y + offset.y });
-      attach(joint, species[name][kind], node, kind === 'fruit' ? 180 + (random() - 0.5) * 16 : (random() - 0.5) * 40,
-        Math.min(1, scale * (0.9 + random() * 0.12)), kind, offset.x, offset.y);
-    }
-  });
-  return plant;
+  cancelAnimationFrame(animations[side]);
+  const start = performance.now();
+  const duration = 20000;
+  const tick = now => {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    els.forEach(el => el.setGrowth(skip + (1 - skip) * eased));
+    if (t < 1) animations[side] = requestAnimationFrame(tick);
+  };
+  animations[side] = requestAnimationFrame(tick);
 }
 
 function plantSides() {
+  // a fresh round of plants sweeps any fallen fruit off the grass
+  while (fallen.length) fallen.pop().remove();
   const season = seasons[root.dataset.season] ? root.dataset.season : 'summer';
-  const reach = Math.max(56, Math.min(220, (window.innerWidth - 800) / 2 - 32));
-  const spacing = season === 'winter' ? 190 : 145;
-  const clumps = Math.ceil(window.innerHeight / spacing) + 1;
-  const seed = { spring: 11, summer: 22, autumn: 33, winter: 44 }[season];
+  const width = Math.max(120, Math.min(230, (window.innerWidth - 800) / 2 - 20));
+  const groundY = groundLine();
+  const forced = new URLSearchParams(location.search).get('plant');
   ['l', 'r'].forEach((side, index) => {
     const column = document.querySelector('.vines-' + side);
     if (!column) return;
     column.replaceChildren();
     if (window.innerWidth < 1000) return;
-    const random = mulberry(seed * 100 + index * 7 + clumps);
-    const fragment = document.createDocumentFragment();
-    for (let i = 0; i < clumps; i++) {
-      const available = seasons[season];
-      const name = available[Math.floor(random() * available.length)];
-      const base = Math.round(i * spacing - 50 + random() * 44);
-      const stems = 2 + Math.floor(random() * (season === 'winter' ? 2 : 3));
-      for (let s = 0; s < stems; s++) {
-        const plant = makePlant(name, season, reach * (0.7 + random() * 0.3), random);
-        plant.style.top = Math.round(base + (random() - 0.5) * 18) + 'px';
-        fragment.appendChild(plant);
+    const picker = mulberry(seeds[side] + index * 1013 + seasonNames.indexOf(season) * 7919);
+    const available = seasons[season];
+    const name = forced || available[Math.floor(picker() * available.length)];
+    const hanging = HANGERS.includes(name);
+    // trailers reach the ground on big pages too: full document span from the basket
+    const height = hanging
+      ? Math.max(380, groundY - 80)
+      : Math.max(420, groundY);
+    const seedBase = (seeds[side] + index * 3457) % 1e6;
+    // multiple basket plants start evenly spaced across the soil and each gets
+    // its own lateral band (wall) so together they fill the column instead of
+    // stacking on the same inner wall
+    const bands = name === 'strawberry'
+      ? [{ offset: -32, wall: 62 }, { offset: 33, wall: 121 }]
+      : [{ offset: 0, wall: 120 }];
+    const plants = bands.map((band, i) => generatePlant(name, {
+      season,
+      seed: (seedBase + i * 997) % 1e6,
+      height,
+      width,
+      hanging,
+      rootJitter: band.offset,
+      wall: band.wall
+    }));
+    grow(side, plants, column, hanging, groundY);
+  });
+}
+
+// ?plucktest=1: synthetically pluck the first visible leaf after load and log
+// the outcome, so the interaction pipeline can be verified headlessly
+if (new URLSearchParams(location.search).has('plucktest')) {
+  window.setTimeout(() => {
+    let img = null;
+    const docH = document.documentElement.scrollHeight;
+    for (const leaf of document.querySelectorAll('.vines img.leafy')) {
+      const r = leaf.getBoundingClientRect();
+      // prefer a low leaf so the bottom-of-page hit-test path gets exercised
+      if (r.width > 8 && r.top > docH * 0.6) { img = leaf; break; }
+    }
+    if (!img) {
+      for (const leaf of document.querySelectorAll('.vines img.leafy')) {
+        if (leaf.getBoundingClientRect().width > 8) { img = leaf; break; }
       }
     }
-    column.appendChild(fragment);
-  });
+    if (!img) { console.error('PLUCKTEST FAIL: no visible leaf'); return; }
+    const rr = img.getBoundingClientRect();
+    const hit = document.elementFromPoint(rr.left + rr.width / 2, rr.top + rr.height / 2);
+    console.error('PLUCKTEST hit-test →', hit === img ? 'the leaf ✓' : hit ? hit.tagName + ' (NOT the leaf!)' : 'NULL');
+    const rect = img.getBoundingClientRect();
+    const down = new PointerEvent('pointerdown', { bubbles: true, clientX: rect.left + 4, clientY: rect.top + 4 });
+    img.dispatchEvent(down);
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: rect.left + 60, clientY: rect.top + 30 }));
+    setTimeout(() => {
+      const flying = document.querySelector('.plucked-layer canvas');
+      let lit = 0;
+      if (flying) {
+        const d = flying.getContext('2d').getImageData(0, 0, flying.width, flying.height).data;
+        for (let i = 3; i < d.length; i += 97) lit += d[i];
+      }
+      console.error('PLUCKTEST ' + (flying && lit > 0 ? 'LIFTED pixels ' + lit : 'FAIL: nothing lifted'));
+      window.dispatchEvent(new PointerEvent('pointerup', {}));
+      setTimeout(() => {
+        const still = document.querySelector('.plucked-layer canvas');
+        console.error('PLUCKTEST ' + (still ? 'ANIMATING (float/fall)' : 'SETTLED'));
+      }, 400);
+    }, 120);
+  }, 9000);
+}
+
+// ----- plucking: grab leaves, flowers and fruit off the plants -----
+// sprites lift into a fixed overlay at their on-screen spot, follow the
+// pointer while held, then either float down like the background leaves or
+// fall heavy and land on the grass.
+const pluckLayer = document.createElement('div');
+pluckLayer.className = 'plucked-layer';
+document.body.appendChild(pluckLayer);
+const fallen = [];
+
+function liftSprite(img) {
+  // snapshot the sprite exactly as displayed: the plant container's linear
+  // transform (rotate + mirror, origin 0 0) composed with the sprite's own
+  // animated tilt, sized so the redraw fills the same on-screen bounding box
+  const rect = img.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const snap = document.createElement('canvas');
+  snap.width = Math.max(1, Math.round(rect.width * dpr));
+  snap.height = Math.max(1, Math.round(rect.height * dpr));
+  const ctx = snap.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  let A = 1, B = 0, C = 0, D = 1;
+  const plant = img.closest('.edge-plant');
+  if (plant) {
+    const ps = getComputedStyle(plant).transform;
+    if (ps && ps !== 'none') {
+      const pm = new DOMMatrixReadOnly(ps);
+      A = pm.a; B = pm.b; C = pm.c; D = pm.d;
+    }
+  }
+  const is = getComputedStyle(img).transform;
+  const own = new DOMMatrixReadOnly(is && is !== 'none' ? is : undefined);
+  const ownAngle = Math.atan2(own.b, own.a);
+  // solve the sprite's unrotated on-screen size from its rotated bounding box
+  const aw = Math.abs(A), ah = Math.abs(D), bw = Math.abs(B), ch = Math.abs(C);
+  const den = aw * ah - bw * ch;
+  let w0 = rect.width, h0 = rect.height;
+  if (Math.abs(den) > 1e-4) {
+    const sw = (rect.width * ah - rect.height * ch) / den;
+    const sh = (rect.height * aw - rect.width * bw) / den;
+    if (sw > 1 && sh > 1 && Number.isFinite(sw) && Number.isFinite(sh)) { w0 = sw; h0 = sh; }
+  }
+  ctx.translate(snap.width / 2, snap.height / 2);
+  ctx.scale(dpr, dpr);
+  ctx.transform(A, B, C, D, 0, 0);
+  ctx.rotate(ownAngle);
+  ctx.drawImage(img, -w0 / 2, -h0 / 2, w0, h0);
+  if (window.location.search.includes('plucktest')) {
+    const probe = ctx.getImageData(0, 0, snap.width, snap.height).data;
+    let lit = 0;
+    for (let i = 3; i < probe.length; i += 97) lit += probe[i];
+    console.error('VINES', JSON.stringify(document.querySelector('.vines').getBoundingClientRect()), 'SIDE', JSON.stringify(document.querySelector('.vines-side').getBoundingClientRect()), 'bodyH', document.body.getBoundingClientRect().height);
+    console.error('LIFT rect', Math.round(rect.width) + 'x' + Math.round(rect.height), 'ACBD', A.toFixed(2), B.toFixed(2), C.toFixed(2), D.toFixed(2), 'own', ownAngle.toFixed(2), 'w0h0', Math.round(w0) + 'x' + Math.round(h0), 'lit', lit);
+  }
+  snap.className = 'plucked';
+  snap.alt = '';
+  snap.dataset.kind = img.dataset.kind || 'leaf';
+  snap.style.width = rect.width + 'px';
+  pluckLayer.appendChild(snap);
+  img.remove();
+  return { el: snap, rect };
+}
+
+let drag = null;
+
+function place(d, x, y, tilt) {
+  d.el.style.transform = tilt ? `translate(${x}px, ${y}px) rotate(${tilt}deg)` : `translate(${x}px, ${y}px)`;
+}
+
+window.addEventListener('pointerdown', e => {
+  const img = e.target instanceof Element && e.target.closest('.vines img');
+  if (!img || img.classList.contains('plant-basket') || drag) return;
+  if (img.getBoundingClientRect().width < 4) return;
+  e.preventDefault();
+  const { el, rect, matrix } = liftSprite(img);
+  drag = {
+    el,
+    kind: el.dataset.kind,
+    ox: e.clientX - rect.left,
+    oy: e.clientY - rect.top,
+    x: rect.left,
+    y: rect.top
+  };
+  place(drag, drag.x, drag.y);
+  window.addEventListener('pointermove', onDragMove);
+  window.addEventListener('pointerup', onDragEnd, { once: true });
+  window.addEventListener('pointercancel', onDragEnd, { once: true });
+});
+
+function onDragMove(e) {
+  if (!drag) return;
+  drag.x = e.clientX - drag.ox;
+  drag.y = e.clientY - drag.oy;
+  place(drag, drag.x, drag.y);
+}
+
+function onDragEnd() {
+  window.removeEventListener('pointermove', onDragMove);
+  const d = drag;
+  drag = null;
+  if (!d) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (d.kind === 'fruit') releaseFruit(d, reduce);
+  else releaseFloat(d, reduce);
+}
+
+function releaseFruit(d, reduce) {
+  let vy = reduce ? 1600 : 90;
+  let last = performance.now();
+  const step = now => {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    d.y += vy * dt;
+    vy += (reduce ? 2600 : 2400) * dt;
+    place(d, d.x, d.y);
+    const groundScreen = groundLine() - window.scrollY;
+    if (d.y + d.el.offsetHeight >= groundScreen) {
+      d.el.className = 'fallen-fruit';
+      d.el.style.position = 'absolute';
+      d.el.style.left = (d.x + window.scrollX) + 'px';
+      d.el.style.top = (groundLine() - d.el.offsetHeight * 0.7) + 'px';
+      d.el.style.transformOrigin = '50% 50%';
+      d.el.style.transform = 'rotate(' + (Math.random() * 24 - 12).toFixed(1) + 'deg)';
+      document.body.appendChild(d.el);
+      fallen.push(d.el);
+      return;
+    }
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function releaseFloat(d, reduce) {
+  const t0 = performance.now();
+  const phase = Math.random() * 6.28;
+  const speed = reduce ? 500 : 85;
+  const swing = reduce ? 0 : 26;
+  const step = now => {
+    const t = (now - t0) / 1000;
+    const x = d.x + Math.sin(t * 2.1 + phase) * swing;
+    const y = d.y + speed * t;
+    place(d, x, y, Math.sin(t * 3 + phase) * 18);
+    if (y < window.innerHeight + 60) requestAnimationFrame(step);
+    else d.el.remove();
+  };
+  requestAnimationFrame(step);
 }
 
 plantSides();
 let resizeTimer;
-window.addEventListener('resize', () => {
+const regrow = () => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(plantSides, 150);
-});
+  resizeTimer = setTimeout(plantSides, 120);
+};
+window.addEventListener('resize', regrow);
+// content settling during load (webfonts reflowing) shifts the ground line
+// without resizing body — re-anchor on load, fonts, and a short settle check
+window.addEventListener('load', regrow);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(regrow);
+const settle = setInterval(() => {
+  const el = [...document.querySelectorAll('.edge-plant')].find(e => e.dataset.hanging !== '1');
+  if (el && Math.abs(parseFloat(el.style.top) - groundLine()) > 4) plantSides();
+}, 400);
+setTimeout(() => clearInterval(settle), 10000);
 new MutationObserver(plantSides).observe(root, { attributes: true, attributeFilter: ['data-season'] });

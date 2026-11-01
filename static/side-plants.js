@@ -41,6 +41,7 @@ function grow(side, plants, column, hanging, groundY) {
     basket.className = 'plant-basket';
     basket.alt = '';
     basket.draggable = false;
+    basket.decoding = 'async';
     column.appendChild(basket);
     plants.forEach(plant => {
       const plantEl = renderPlant(plant, column, 0);
@@ -132,6 +133,20 @@ function plantSides() {
 // ?plucktest=1: synthetically pluck the first visible leaf after load and log
 // the outcome, so the interaction pipeline can be verified headlessly
 if (new URLSearchParams(location.search).has('plucktest')) {
+  window.__plucktest = true;
+  window.setTimeout(() => {
+    const pondEl = document.querySelector('.pond');
+    if (!pondEl) { console.error('POND-TEST FAIL: no pond'); return; }
+    const fruit = document.querySelector('.vines img[data-kind="fruit"]');
+    if (!fruit || getComputedStyle(fruit).display === 'none') { console.error('POND-TEST FAIL: no visible fruit'); return; }
+    const pr = pondEl.getBoundingClientRect();
+    const r = fruit.getBoundingClientRect();
+    const cx = Math.round(pr.left + pr.width / 2);
+    fruit.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, clientX: r.left + 4, clientY: r.top + 4 }));
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: cx, clientY: Math.round(r.top - 40) }));
+    window.dispatchEvent(new PointerEvent('pointerup', { clientX: cx, clientY: Math.round(r.top - 40) }));
+    console.error('POND-TEST released fruit over the pond');
+  }, 15500);
   window.setTimeout(() => {
     let img = null;
     const docH = document.documentElement.scrollHeight;
@@ -276,6 +291,7 @@ function onDragEnd() {
 }
 
 function releaseFruit(d, reduce) {
+  const pond = pondBox(d);
   let vy = reduce ? 1600 : 90;
   let last = performance.now();
   const step = now => {
@@ -284,8 +300,9 @@ function releaseFruit(d, reduce) {
     d.y += vy * dt;
     vy += (reduce ? 2600 : 2400) * dt;
     place(d, d.x, d.y);
-    const groundScreen = groundLine() - window.scrollY;
-    if (d.y + d.el.offsetHeight >= groundScreen) {
+    const stop = pond ? pond.waterScreen : groundLine() - d.el.offsetHeight;
+    if (d.y >= stop) {
+      if (pond) { landInPond(d, pond); return; }
       d.el.className = 'fallen-fruit';
       d.el.style.position = 'absolute';
       d.el.style.left = (d.x + window.scrollX) + 'px';
@@ -299,6 +316,73 @@ function releaseFruit(d, reduce) {
     requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
+}
+
+// the pond, in document coords, if the drop lands over its water
+function pondBox(d) {
+  const el = document.querySelector('.pond');
+  if (!el) return null;
+  const pr = el.getBoundingClientRect();
+  const x = d.x + window.scrollX;
+  if (x < pr.left + window.scrollX + 16 || x > pr.right + window.scrollX - 16) return null;
+  return { el, left: pr.left + window.scrollX, right: pr.right + window.scrollX, top: pr.top + window.scrollY, waterScreen: pr.top + 20 };
+}
+
+// bobbing, drifting fruit; ducks shove it around
+const floaters = [];
+let floatRaf = 0;
+
+function landInPond(d, pond) {
+  const el = d.el;
+  const w = parseFloat(el.style.width) || el.offsetWidth;
+  const h = parseFloat(el.style.height) || el.offsetHeight;
+  const wrap = document.createElement('span');
+  wrap.className = 'in-pond';
+  wrap.style.position = 'absolute';
+  wrap.style.left = (d.x + window.scrollX - pond.left) + 'px';
+  wrap.style.top = (pond.waterScreen + window.scrollY - pond.top - h * 0.45) + 'px';
+  wrap.style.width = w + 'px';
+  wrap.style.height = h + 'px';
+  el.className = '';
+  el.style.position = 'absolute';
+  el.style.left = '0';
+  el.style.top = '0';
+  el.style.transformOrigin = '50% 50%';
+  el.style.transform = 'none';
+  wrap.appendChild(el);
+  const water = pond.el.querySelector('.pond-water');
+  if (water && water.nextSibling) pond.el.insertBefore(wrap, water.nextSibling);
+  else pond.el.appendChild(wrap);
+  floaters.push({ el: wrap, w, cx: d.x - pond.left, vx: 0, drift: Math.random() * 8 - 4, t0: performance.now(), phase: Math.random() * 6.28, pond });
+  if (window.__plucktest) console.error('POND-TEST floating, fruit bobbing in the pond');
+  bobLoop();
+}
+
+function bobLoop() {
+  if (floatRaf) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let last = performance.now();
+  const step = now => {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    const ducks = reduce ? [] : [...document.querySelectorAll('.runner')].map(r => r.getBoundingClientRect());
+    for (const f of floaters) {
+      const fx = f.pond.left + f.cx + f.w / 2;
+      for (const dr of ducks) {
+        const dcx = dr.left + dr.width / 2 + window.scrollX;
+        if (Math.abs(dcx - fx) < 34 && dr.bottom > f.pond.top + 20) f.vx += (dcx < fx ? 1 : -1) * 90 * dt;
+      }
+      f.vx += (f.drift - f.vx) * Math.min(1, dt * 0.8);
+      f.cx += f.vx * dt;
+      const minX = 18, maxX = f.pond.right - f.pond.left - f.w - 18;
+      if (f.cx < minX || f.cx > maxX) { f.cx = Math.max(minX, Math.min(maxX, f.cx)); f.vx *= -0.4; }
+      if (reduce) continue;
+      const t = (now - f.t0) / 1000;
+      f.el.style.transform = 'translate(0,' + (Math.sin(t * 2.1 + f.phase) * 2.5).toFixed(2) + 'px) rotate(' + (Math.sin(t * 1.6 + f.phase) * 7).toFixed(2) + 'deg)';
+    }
+    floatRaf = floaters.length ? requestAnimationFrame(step) : 0;
+  };
+  floatRaf = requestAnimationFrame(step);
 }
 
 function releaseFloat(d, reduce) {

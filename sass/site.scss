@@ -261,8 +261,14 @@ img {
   position: relative;
   width: 100%;
   height: 0;
+  transform-origin: -4px 0;
   --stem-main: #4B7044;
   --stem-light: #83A165;
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: plant-breeze var(--swd, 12s) ease-in-out infinite alternate;
+    animation-delay: var(--sway-delay, 0s);
+  }
 }
 
 .species-apple .plant-growth {
@@ -304,6 +310,12 @@ img {
 .plant-accent { z-index: 1; }
 .leafy-back { z-index: -1; filter: brightness(0.8) saturate(0.85); }
 
+// accents and leaves past the breeze budget hold no animation layer
+.leafy.stiff,
+.leafy.plant-accent {
+  animation: none !important;
+}
+
 // leaves nod individually; the rotate channel composes with each leaf's
 // fan rotation, pivoting at the leaf stalk (transform-origin 50% 100%)
 @media (prefers-reduced-motion: no-preference) {
@@ -316,6 +328,13 @@ img {
 @keyframes leaf-breeze {
   from { rotate: -3deg; }
   to { rotate: 4.5deg; }
+}
+
+// the whole plant leans in the wind, pivoting at its root so the base stays
+// planted while the tip sways
+@keyframes plant-breeze {
+  from { rotate: -0.7deg; }
+  to { rotate: 0.9deg; }
 }
 
 // falling leaves
@@ -405,6 +424,7 @@ img {
   position: absolute;
   z-index: 5;
   inset: 0;
+  contain: layout style paint;
   pointer-events: none;
   display: none;
   overflow: hidden;
@@ -1612,6 +1632,27 @@ footer {
     top: 0;
     will-change: transform;
     image-rendering: pixelated;
+  }
+}
+
+// fruit floating in the pond: the canvas bobs inside a wrapper that paints a
+// translucent layer of the pond's own water color over it
+.in-pond {
+  display: block;
+  pointer-events: none;
+  z-index: 5;
+
+  canvas {
+    image-rendering: pixelated;
+    will-change: transform;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 45% -2px -2px -2px;
+    border-radius: 0 0 45% 45%;
+    background: color-mix(in srgb, var(--pond-water, #5FA3B4) 55%, transparent);
   }
 }
 

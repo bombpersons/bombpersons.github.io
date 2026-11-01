@@ -56,7 +56,7 @@ export function renderPlant(plant, parent, growth = 1) {
     setVisible(rect, false);
     svg.appendChild(rect);
     let snow = null;
-    if (plant.season === 'winter') {
+    if (plant.season === 'winter' && plant.species !== 'pine') {
       snow = document.createElementNS(svgNS, 'path');
       snow.setAttribute('d', `M${node.x - 5} ${node.y - 3}h8`);
       snow.setAttribute('class', 'stem-snow');
@@ -66,7 +66,10 @@ export function renderPlant(plant, parent, growth = 1) {
     joints.push({ node, p, rect, snow, shown: false });
   });
 
-  // sprites are created once at final size and revealed/scaled by setGrowth
+  // sprites are created once at final size and revealed/scaled by setGrowth.
+  // breeze budget: accents and leaves past the cap stay still — hundreds of
+  // infinite CSS animations mean hundreds of compositor layers
+  let breezeBudget = 48;
   const sprites = plant.attachments.map(a => {
     if (a.pedicel) {
       const pedicel = document.createElementNS(svgNS, 'path');
@@ -79,10 +82,16 @@ export function renderPlant(plant, parent, growth = 1) {
     const image = document.createElement('img');
     image.className = 'leafy' + (a.kind === 'leaf' ? '' : ' plant-accent') + (a.back ? ' leafy-back' : '');
     image.dataset.kind = a.kind;
+    if (a.kind !== 'leaf' || breezeBudget-- <= 0) image.classList.add('stiff');
     image.src = new URL(a.file, plantBase).href;
     image.alt = '';
     image.draggable = false;
+    image.decoding = 'async';
     image.style.animationDelay = (-(sway() * 12)).toFixed(2) + 's';
+    const w = Math.max(1, Math.round(a.width));
+    image.width = w;
+    image.style.left = (a.x - w / 2) + 'px';
+    image.style.top = (a.y - w * a.aspect) + 'px';
     setVisible(image, false);
     growthEl.appendChild(image);
     return { a, pedicel: pedicelEl, image, shown: false };
@@ -117,15 +126,11 @@ export function renderPlant(plant, parent, growth = 1) {
         return;
       }
       const maturity = Math.min(1, (t - a.birth) / ((a.mature - a.birth) || 1));
-      const width = Math.max(1, Math.round(a.width * maturity));
-      if (width < 4) {
+      if (maturity <= 0) {
         if (s.shown) { setVisible(s.image, false); if (s.pedicel) setVisible(s.pedicel, false); s.shown = false; }
         return;
       }
-      s.image.width = width;
-      s.image.style.left = (a.x - width / 2) + 'px';
-      s.image.style.top = (a.y - width * a.aspect) + 'px';
-      s.image.style.transform = `rotate(${a.deg.toFixed(1)}deg)`;
+      s.image.style.transform = `rotate(${a.deg.toFixed(1)}deg) scale(${(0.25 + 0.75 * maturity).toFixed(3)})`;
       if (!s.shown) { setVisible(s.image, true); if (s.pedicel) setVisible(s.pedicel, true); s.shown = true; }
     });
   }

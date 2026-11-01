@@ -29,25 +29,36 @@ if (scene) {
   });
   yard.setReducedMotion(motion.matches);
 
+  // last-value cache keeps idle frames from touching the DOM at all
+  const splashes = ducks.map(d => d.querySelector('.rd-splash'));
+  const cache = hens.concat(ducks).map(() => ({}));
   function paint() {
     scene.dataset.flock = yard.flock.mode;
     yard.hens.forEach((hen, i) => {
-      const element = hens[i];
-      element.dataset.state = hen.state;
-      element.style.transform = `translate3d(${hen.x.toFixed(2)}px,0,0)`;
-      element.style.setProperty('--face', hen.face);
-      element.style.opacity = hen.opacity.toFixed(2);
-      element.disabled = hen.state === 'sleeping' || hen.state === 'returning';
+      const element = hens[i], c = cache[i];
+      if (c.state !== hen.state) {
+        element.dataset.state = hen.state;
+        element.disabled = hen.state === 'sleeping' || hen.state === 'returning';
+        c.state = hen.state;
+      }
+      if (c.face !== hen.face) { element.style.setProperty('--face', hen.face); c.face = hen.face; }
+      const opacity = hen.opacity.toFixed(2);
+      if (c.opacity !== opacity) { element.style.opacity = opacity; c.opacity = opacity; }
+      const tx = `translate3d(${hen.x.toFixed(2)}px,0,0)`;
+      if (c.tx !== tx) { element.style.transform = tx; c.tx = tx; }
     });
     yard.ducks.forEach((duck, i) => {
-      const element = ducks[i];
-      element.dataset.state = duck.state;
-      element.style.transform = `translate3d(${duck.x.toFixed(2)}px,${duck.y.toFixed(2)}px,0)`;
-      element.style.setProperty('--face', duck.face);
-      element.style.setProperty('--dive-angle', duck.angle.toFixed(1) + 'deg');
-      const splash = element.querySelector('.rd-splash');
-      splash.style.opacity = (duck.splash / 0.65).toFixed(2);
-      splash.style.transform = `translateY(${(yard.bounds.waterY - duck.y).toFixed(2)}px) scale(${(1.5 - duck.splash / 1.3).toFixed(2)})`;
+      const element = ducks[i], c = cache[hens.length + i];
+      if (c.state !== duck.state) { element.dataset.state = duck.state; c.state = duck.state; }
+      if (c.face !== duck.face) { element.style.setProperty('--face', duck.face); c.face = duck.face; }
+      const angle = duck.angle.toFixed(1) + 'deg';
+      if (c.angle !== angle) { element.style.setProperty('--dive-angle', angle); c.angle = angle; }
+      const tx = `translate3d(${duck.x.toFixed(2)}px,${duck.y.toFixed(2)}px,0)`;
+      if (c.tx !== tx) { element.style.transform = tx; c.tx = tx; }
+      const splashOpacity = (duck.splash / 0.65).toFixed(2);
+      if (c.splash !== splashOpacity) { splashes[i].style.opacity = splashOpacity; c.splash = splashOpacity; }
+      const st = `translateY(${(yard.bounds.waterY - duck.y).toFixed(2)}px) scale(${(1.5 - duck.splash / 1.3).toFixed(2)})`;
+      if (c.st !== st) { splashes[i].style.transform = st; c.st = st; }
     });
   }
 
